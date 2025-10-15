@@ -1,0 +1,10 @@
+No requiere autorizaciones para crear usuarios
+Roles 
+-Administrativo
+-Rol asistencial y administrativo-1 al 10 de cada mes
+-Rol de transporte-habilitado todo el mes
+
+Correo corporativo- cuentasdecobro@preventivaips.com.co
+
+Número de (cuenta de cobro)factura-se haga automatico DSFECHA(M/Y)-CC   DS=DOCUMENTO SOPORTE
+PONER EN EL FORM LA FECHA DE LA QUE VA A RADICAR

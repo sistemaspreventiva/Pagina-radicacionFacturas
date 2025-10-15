@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+/* Colores de marca */
+:root{
+  --ps-navy:#0a2a4d; --ps-blue:#0f5cc0; --ps-cyan:#13c2be; --ps-orange:#ff8a00;
+}
+a { text-decoration: none; color: inherit; }
+
+/* Seguridad: que se vea algo aunque Tailwind falle */
+body { background: #f8fafc; }
