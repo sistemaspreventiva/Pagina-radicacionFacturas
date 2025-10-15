@@ -59,7 +59,7 @@ transporter.verify((err) => {
 /* ──────────────────────────────────────────────────────────────
    ENDPOINTS
    ────────────────────────────────────────────────────────────── */
-app.get("/", (_req, res) => res.send({ ok: true }));
+app.get("/api/health", (_req, res) => res.send({ ok: true }));
 
 /**
  * POST /api/radicaciones
