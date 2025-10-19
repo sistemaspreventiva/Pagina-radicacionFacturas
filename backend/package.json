@@ -1,24 +1,23 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
+  "private": true,
+  "description": "Backend monolito: API + serve Vite dist",
   "main": "server.js",
   "type": "commonjs",
-  "license": "ISC",
-  "engines": {
-    "node": "20.x"
-  },
+  "engines": { "node": "20.x" },
   "scripts": {
-    "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
   "dependencies": {
+    "@prisma/client": "^5.20.0",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
-    "nodemailer": "^7.0.6"
+    "nodemailer": "^7.0.6",
+    "prisma": "^5.20.0"
   }
 }

@@ -1,0 +1,19 @@
+// backend/prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  dni       String?
+  role      String   // "asistencial" | "administrativo" | "conductor"
+  password  String   // bcrypt hash
+  createdAt DateTime @default(now())
+}
