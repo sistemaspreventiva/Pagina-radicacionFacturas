@@ -1,10 +1,8 @@
-// src/services/api.js
-// En producción (Render) usa same-origin. En local puedes definir VITE_API_BASE=http://localhost:4000
+// Usa same-origin en producción. En local puedes definir VITE_API_BASE=http://localhost:4000
 const BASE = (import.meta.env?.VITE_API_BASE || "").trim();
 export const apiBase = BASE ? BASE.replace(/\/$/, "") : "";
 
-/* ======================= AUTH ======================= */
-
+/* ---------- AUTH ---------- */
 export async function registerUser(payload) {
   const res = await fetch(`${apiBase}/api/auth/register`, {
     method: "POST",
@@ -33,32 +31,26 @@ export async function fetchMe(token) {
   return res.json(); // { ok, user }
 }
 
-/* =================== RADICACIONES =================== */
+/* ---------- RADICACIONES ---------- */
+export async function uploadRadicacion(formDataOrPayload) {
+  // Admite: FormData existente O un objeto con { files, numero, valor, username, name, email, role, timestamp }
+  let fd;
+  if (formDataOrPayload instanceof FormData) {
+    fd = formDataOrPayload;
+  } else {
+    const { files, numero, valor, username, name, email, role, timestamp } = formDataOrPayload || {};
+    fd = new FormData();
+    Array.from(files || []).forEach((f) => fd.append("files", f));
+    fd.append("numero", String(numero ?? ""));
+    fd.append("valor", String(valor ?? ""));
+    fd.append("username", String(username ?? ""));
+    fd.append("name", String(name ?? ""));
+    fd.append("email", String(email ?? ""));
+    fd.append("role", String(role ?? ""));
+    fd.append("timestamp", String(timestamp ?? new Date().toISOString()));
+  }
 
-export async function uploadRadicacion({
-  files,       // FileList | File[]
-  numero,      // string
-  valor,       // string | number
-  username,    // string
-  name,        // string
-  email,       // string
-  role,        // "asistencial" | "administrativo" | "conductor"
-  timestamp,   // string (ISO)
-}) {
-  const fd = new FormData();
-  Array.from(files || []).forEach((f) => fd.append("files", f));
-  fd.append("numero", String(numero ?? ""));
-  fd.append("valor", String(valor ?? ""));
-  fd.append("username", String(username ?? ""));
-  fd.append("name", String(name ?? ""));
-  fd.append("email", String(email ?? ""));
-  fd.append("role", String(role ?? ""));
-  fd.append("timestamp", String(timestamp ?? new Date().toISOString()));
-
-  const res = await fetch(`${apiBase}/api/radicaciones`, {
-    method: "POST",
-    body: fd,
-  });
+  const res = await fetch(`${apiBase}/api/radicaciones`, { method: "POST", body: fd });
   if (!res.ok) throw new Error(await res.text());
   return res.json(); // { ok, id, count }
 }
