@@ -1,8 +1,8 @@
-// src/AppRoutes.jsx
+// src/routes/AppRoutes.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
-import Login from "./pages/Login.jsx";
-import Register from "./pages/Register.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
+import Login from "../pages/Login.jsx";
+import Register from "../pages/Register.jsx";
+import Dashboard from "../pages/Dashboard.jsx";
 
 export default function AppRoutes() {
   return (

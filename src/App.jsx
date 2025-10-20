@@ -1,7 +1,8 @@
 // src/App.jsx
+// src/App.jsx
 import { Link, NavLink } from "react-router-dom";
-import AppRoutes from "./AppRoutes.jsx"; // ← ÚNICO import de AppRoutes
-import logo from "./assets/logo.svg";
+import AppRoutes from "./routes/AppRoutes.jsx"; // ← ruta correcta
+import logo from "./assets/logo.svg"; // si no tienes logo.svg, comenta esta línea y la <img />
 
 export default function App() {
   return (
@@ -10,6 +11,7 @@ export default function App() {
       <header className="bg-white border-b border-slate-200/70">
         <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
+            {/* Si no tienes el logo aún, comenta la siguiente línea */}
             <img src={logo} alt="Preventiva IPS" className="h-10 w-auto" />
             <div className="leading-tight">
               <p className="font-semibold text-slate-800">Preventiva Salud IPS</p>
@@ -24,7 +26,7 @@ export default function App() {
         </div>
       </header>
 
-      {/* Contenido (rutas) */}
+      {/* Rutas */}
       <main className="flex-1">
         <AppRoutes />
       </main>
