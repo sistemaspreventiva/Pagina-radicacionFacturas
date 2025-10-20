@@ -16,26 +16,45 @@ const prisma = new PrismaClient();
 
 const app = express();
 
-// ───────────────────────────────────────────────────────────────
-// CORS (en monolito puedes omitirlo; si lo dejas, define CORS_ORIGIN)
-// ───────────────────────────────────────────────────────────────
-const ORIGIN = process.env.CORS_ORIGIN || "";
-if (ORIGIN) {
-  app.use(cors({ origin: ORIGIN.split(",").map(s => s.trim()), credentials: false }));
+/* ──────────────────────────────────────────────────────────────
+   CORS (útil solo si consumirás desde OTRO origen)
+   Si es monolito (frontend+backend mismo dominio), puedes omitirlo.
+   Si lo dejas, define CORS_ORIGIN en Environment.
+   ────────────────────────────────────────────────────────────── */
+const WHITELIST = (process.env.CORS_ORIGIN || "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+if (WHITELIST.length) {
+  app.use(
+    cors({
+      origin: (origin, cb) => {
+        if (!origin) return cb(null, true); // Postman/SSR
+        return WHITELIST.includes(origin)
+          ? cb(null, true)
+          : cb(new Error("CORS: origin no permitido"));
+      },
+      methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+    })
+  );
+  // Preflights
+  app.options("*", cors());
 }
 
 // JSON para endpoints no-multipart
 app.use(express.json());
 
-// ───────────────────────────────────────────────────────────────
-// Multer en memoria (hasta 10 archivos, 15MB c/u)
-// ───────────────────────────────────────────────────────────────
+/* ──────────────────────────────────────────────────────────────
+   Multer en memoria (hasta 10 archivos, 15MB c/u)
+   ────────────────────────────────────────────────────────────── */
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 15 * 1024 * 1024, files: 10 },
 });
 
-// Tipos permitidos: PDF, Word, Excel
+/* Tipos permitidos: PDF, Word, Excel */
 const ALLOWED = new Set([
   "application/pdf",
   "application/msword", // .doc
@@ -45,13 +64,13 @@ const ALLOWED = new Set([
   "application/vnd.ms-excel.sheet.macroEnabled.12", // .xlsm (opcional)
 ]);
 
-// Límite total seguro (~25MB Gmail con codificación); por defecto 20MB
+/* Límite total seguro (~25MB Gmail con codificación); por defecto 20MB */
 const MAX_TOTAL_MB = Number(process.env.MAX_TOTAL_MB || 20);
 const MAX_TOTAL_BYTES = MAX_TOTAL_MB * 1024 * 1024;
 
-// ───────────────────────────────────────────────────────────────
-// SMTP (Gmail/Workspace u otro proveedor)
-// ───────────────────────────────────────────────────────────────
+/* ──────────────────────────────────────────────────────────────
+   SMTP (Gmail/Workspace u otro proveedor)
+   ────────────────────────────────────────────────────────────── */
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST, // p.ej. smtp.gmail.com
   port: Number(process.env.SMTP_PORT || 587),
@@ -64,9 +83,9 @@ transporter.verify((err) => {
   else console.log("SMTP listo para enviar");
 });
 
-// ───────────────────────────────────────────────────────────────
-// Helpers Auth (JWT)
-// ───────────────────────────────────────────────────────────────
+/* ──────────────────────────────────────────────────────────────
+   Helpers Auth (JWT)
+   ────────────────────────────────────────────────────────────── */
 function signToken(user) {
   return jwt.sign(
     { sub: user.id, role: user.role, username: user.username },
@@ -87,21 +106,20 @@ function auth(req, res, next) {
   }
 }
 
-// ───────────────────────────────────────────────────────────────
-// ENDPOINTS API
-// ───────────────────────────────────────────────────────────────
+/* ──────────────────────────────────────────────────────────────
+   ENDPOINTS API
+   ────────────────────────────────────────────────────────────── */
 
-// Healthcheck (moverlo fuera de "/")
+// Healthcheck (fuera de "/")
 app.get("/api/health", (_req, res) => res.send({ ok: true }));
 
-// Registro de usuario
+// Registrar usuario
 app.post("/api/auth/register", async (req, res) => {
   try {
     const { email, username, password, dni, role } = req.body || {};
     if (!email || !username || !password || !role) {
       return res.status(400).send("Faltan campos requeridos");
     }
-
     const exists = await prisma.user.findFirst({
       where: { OR: [{ email }, { username }] },
       select: { id: true },
@@ -242,9 +260,9 @@ app.post("/api/radicaciones", upload.array("files", 10), async (req, res) => {
   }
 });
 
-// ───────────────────────────────────────────────────────────────
-// SERVIR FRONTEND (Vite) DESDE /dist — Express 5 compatible
-// ───────────────────────────────────────────────────────────────
+/* ──────────────────────────────────────────────────────────────
+   SERVIR FRONTEND (Vite) DESDE /dist — Express 5 compatible
+   ────────────────────────────────────────────────────────────── */
 const DIST_DIR = path.join(__dirname, "..", "dist");
 if (fs.existsSync(DIST_DIR)) {
   app.use(express.static(DIST_DIR));
@@ -256,8 +274,8 @@ if (fs.existsSync(DIST_DIR)) {
   console.warn("⚠️ No se encontró la carpeta dist. Ejecuta el build del frontend.");
 }
 
-// ───────────────────────────────────────────────────────────────
-// START
-// ───────────────────────────────────────────────────────────────
+/* ──────────────────────────────────────────────────────────────
+   START
+   ────────────────────────────────────────────────────────────── */
 const PORT = Number(process.env.PORT || 4000);
 app.listen(PORT, () => console.log(`Servidor escuchando en :${PORT}`));

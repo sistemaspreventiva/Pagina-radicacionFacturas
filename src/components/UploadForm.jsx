@@ -1,4 +1,3 @@
-// src/components/UploadForm.jsx
 import { useMemo, useState } from "react";
 import { uploadRadicacion } from "../services/api";
 
@@ -24,7 +23,7 @@ export default function UploadForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("asistencial");
-  const [dni, setDni] = useState(""); // solicitado para registro, lo dejamos visible por si contabilidad lo requiere
+  const [dni, setDni] = useState(""); // informativo
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState(null);
 
@@ -50,7 +49,7 @@ export default function UploadForm() {
 
     try {
       setLoading(true);
-      const resp = await uploadRadicacion({
+      const data = await uploadRadicacion({
         files,
         numero,
         valor,
@@ -60,7 +59,7 @@ export default function UploadForm() {
         role,
         timestamp: new Date().toISOString(),
       });
-      setMsg({ type: "ok", text: `Enviado ✅ (ID: ${resp.id}) - Adjuntos: ${resp.count}` });
+      setMsg({ type: "ok", text: `Enviado ✅ (ID: ${data.id}) - Adjuntos: ${data.count}` });
       setFiles([]);
       setValor("");
     } catch (err) {
@@ -71,8 +70,8 @@ export default function UploadForm() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl p-6">
-      <h1 className="text-2xl font-semibold mb-2">Subir Radicación</h1>
+    <div className="mx-auto max-w-3xl">
+      <h1 className="text-2xl font-semibold mb-2 text-slate-800">Subir Radicación</h1>
       <p className="text-sm mb-6 opacity-80">
         {role === "conductor"
           ? "Conductores: habilitado todo el mes."
@@ -109,7 +108,7 @@ export default function UploadForm() {
           />
         </div>
 
-        {/* DNI / Cédula (solo informativo para contabilidad) */}
+        {/* DNI / Cédula */}
         <div>
           <label className="block text-sm mb-1">DNI / Cédula</label>
           <input
@@ -206,7 +205,7 @@ export default function UploadForm() {
             disabled={loading || !habilitado}
             className={`rounded-md px-4 py-2 text-white ${
               habilitado
-                ? "bg-emerald-600 hover:bg-emerald-700"
+                ? "bg-[var(--p-prim)] hover:bg-[var(--p-prim-600)]"
                 : "bg-gray-400 cursor-not-allowed"
             }`}
           >

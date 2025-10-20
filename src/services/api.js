@@ -1,8 +1,10 @@
-// Usa same-origin en producción. En local puedes definir VITE_API_BASE=http://localhost:4000
+// src/services/api.js
+// En producción (Render) usa same-origin. En local puedes definir VITE_API_BASE=http://localhost:4000
 const BASE = (import.meta.env?.VITE_API_BASE || "").trim();
 export const apiBase = BASE ? BASE.replace(/\/$/, "") : "";
 
-/* ---------- AUTH ---------- */
+/* ======================= AUTH ======================= */
+
 export async function registerUser(payload) {
   const res = await fetch(`${apiBase}/api/auth/register`, {
     method: "POST",
@@ -31,9 +33,10 @@ export async function fetchMe(token) {
   return res.json(); // { ok, user }
 }
 
-/* ---------- RADICACIONES ---------- */
+/* =================== RADICACIONES =================== */
+
 export async function uploadRadicacion(formDataOrPayload) {
-  // Admite: FormData existente O un objeto con { files, numero, valor, username, name, email, role, timestamp }
+  // Admite FormData ya armado o un objeto con { files, numero, valor, username, name, email, role, timestamp }
   let fd;
   if (formDataOrPayload instanceof FormData) {
     fd = formDataOrPayload;
