@@ -1,5 +1,6 @@
 // src/pages/Instructivo.jsx
-import { instructivos } from "../lib/instructivos";
+import { instructivos } from "../lib/instructivos.js";
+
 
 export default function Instructivo() {
   return (
