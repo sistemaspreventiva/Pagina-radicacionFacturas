@@ -1,7 +1,6 @@
 // src/pages/Instructivo.jsx
 import { instructivos } from "../lib/instructivos.js";
 
-
 export default function Instructivo() {
   return (
     <main className="max-w-6xl mx-auto px-4 py-10">
@@ -47,7 +46,7 @@ function Card({ titulo, descripcion, items, color }) {
         {items.map((d, i) => (
           <li key={i}>
             <a
-              href={d.href}
+              href={encodeURI(d.href)}          // importante: URL con espacios/acentos
               target="_blank"
               rel="noopener noreferrer"
               className="w-full inline-flex items-center justify-between rounded-lg border px-3 py-2 hover:bg-slate-50"
