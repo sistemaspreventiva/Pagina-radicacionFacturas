@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "Backend radicacion facturas",
+  "description": "Backend radicacion facturas (sin DB)",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {

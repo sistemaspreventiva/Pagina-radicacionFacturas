@@ -53,21 +53,18 @@ const MAX_TOTAL_BYTES = MAX_TOTAL_MB * 1024 * 1024;
    SMTP (fallback opcional)
    ────────────────────────────────────────────────────────────── */
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST, // smtp.gmail.com | smtp.office365.com
+  host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT || 587),
-  secure: (process.env.SMTP_SECURE || "false") === "true", // true si usas 465
+  secure: (process.env.SMTP_SECURE || "false") === "true", // debe ser false con 587
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 20000,
   tls: {
     minVersion: "TLSv1.2",
-    servername: process.env.SMTP_HOST,
   },
 });
+
 
 // Log informativo (si falla aquí, igual puedes usar Resend)
 transporter.verify((err) => {
@@ -122,7 +119,7 @@ app.get("/", (_req, res) => res.json({ ok: true }));
 
 app.get("/api/health", (_req, res) => res.json({ ok: true, ts: Date.now() }));
 
-/** Diagnóstico SMTP muy rápido */
+/** Diagnóstico SMTP muy rápido (opcional) */
 app.get("/api/diag/smtp", async (_req, res) => {
   const timeoutMs = 7000;
   try {
