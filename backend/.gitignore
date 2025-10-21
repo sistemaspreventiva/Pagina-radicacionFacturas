@@ -1,5 +1,11 @@
-node_modules
-# Keep environment variables out of version control
+# Node
+node_modules/
+npm-debug.log*
 .env
-
-/generated/prisma
+.env.* 
+# Vite/React
+dist/
+.vite/
+# Editor
+.DS_Store
+.vscode/
