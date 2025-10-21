@@ -1,8 +1,9 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "type": "commonjs",
+  "description": "Backend radicacion facturas",
   "main": "server.js",
+  "type": "commonjs",
   "scripts": {
     "start": "node server.js"
   },
@@ -12,8 +13,8 @@
     "express": "^5.1.0",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.6",
-    "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
     "@prisma/client": "^5.22.0"
   },
   "devDependencies": {

@@ -1,112 +1,260 @@
+// backend/server.js
+require("dotenv").config();
+
+const express = require("express");
+const cors = require("cors");
+const multer = require("multer");
+const nodemailer = require("nodemailer");
+const path = require("path");
+const fs = require("fs");
+
+const app = express();
+
 /* ──────────────────────────────────────────────────────────────
-   CORREO: SMTP clásico o proveedor HTTP (Resend)
+   CORS (puedes dejar vacío si sirves el front desde el mismo server)
    ────────────────────────────────────────────────────────────── */
-const MAIL_PROVIDER = (process.env.MAIL_PROVIDER || "smtp").toLowerCase();
-const MAIL_FROM = process.env.MAIL_FROM || "";
-const MAIL_TO = (process.env.MAIL_TO || "")
-  .split(",")
-  .map((s) => s.trim())
-  .filter(Boolean);
-
-if (!MAIL_FROM) {
-  console.warn("⚠️ MAIL_FROM no está configurado. Los correos fallarán hasta que lo definas.");
-}
-if (!MAIL_TO.length) {
-  console.warn("⚠️ MAIL_TO no está configurado. Los correos fallarán hasta que lo definas.");
-}
-
-const SMTP_HOST = process.env.SMTP_HOST;
-const SMTP_SECURE_ENV = (process.env.SMTP_SECURE || "false") === "true";
-const SMTP_PORT = Number(
-  process.env.SMTP_PORT || (SMTP_SECURE_ENV ? 465 : 587)
-);
-const SMTP_SECURE = SMTP_SECURE_ENV || SMTP_PORT === 465;
-const SMTP_CONNECTION_TIMEOUT = Number(process.env.SMTP_CONNECTION_TIMEOUT || 10000);
-const SMTP_SOCKET_TIMEOUT = Number(process.env.SMTP_SOCKET_TIMEOUT || 60000);
-const SMTP_GREETING_TIMEOUT = Number(process.env.SMTP_GREETING_TIMEOUT || 10000);
-const SMTP_IGNORE_TLS = (process.env.SMTP_IGNORE_TLS || "false").toLowerCase() === "true";
-const SMTP_USER = process.env.SMTP_USER;
-const SMTP_PASS = process.env.SMTP_PASS;
-
-const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
-const RESEND_ENDPOINT = process.env.RESEND_BASE_URL || "https://api.resend.com/emails";
-const RESEND_TIMEOUT_MS = Number(process.env.RESEND_TIMEOUT_MS || 30000);
-const fetchFn = typeof globalThis.fetch === "function" ? globalThis.fetch.bind(globalThis) : null;
-
-function isTimeoutError(err = {}) {
-  const msg = err.message || "";
-  return (
-    ["ETIMEDOUT", "ESOCKET", "ECONNECTION", "ETIMEOUT"].includes(err.code) ||
-    /timed out/i.test(msg)
+const ORIGIN = process.env.CORS_ORIGIN || ""; // p.ej. http://localhost:5173
+if (ORIGIN) {
+  app.use(
+    cors({
+      origin: ORIGIN.split(",").map((s) => s.trim()),
+      credentials: false,
+    })
   );
 }
 
-function buildTimeoutError(err, providerLabel) {
-  const base = providerLabel === "smtp"
-    ? `No se pudo conectar al servidor SMTP ${SMTP_HOST || "(sin host)"}:${SMTP_PORT}. ` +
-      "Verifica las reglas de firewall o considera usar MAIL_PROVIDER=resend para enviar vía HTTP."
-    : `No se obtuvo respuesta del proveedor ${providerLabel} en ${RESEND_TIMEOUT_MS}ms.`;
-  const wrapped = new Error(base);
-  wrapped.code = err && err.code ? err.code : `${providerLabel.toUpperCase()}_TIMEOUT`;
-  wrapped.detail = err && err.message ? err.message : null;
-  return wrapped;
+/* Si tienes otros endpoints JSON */
+app.use(express.json());
+
+/* ──────────────────────────────────────────────────────────────
+   Multer: Memoria (hasta 10 archivos, 15MB cada uno)
+   ────────────────────────────────────────────────────────────── */
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 15 * 1024 * 1024, files: 10 },
+});
+
+/* Tipos permitidos: PDF, Word, Excel */
+const ALLOWED = new Set([
+  "application/pdf",
+  "application/msword", // .doc
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+  "application/vnd.ms-excel", // .xls
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+  "application/vnd.ms-excel.sheet.macroEnabled.12", // .xlsm (opcional)
+]);
+
+/* Límite total seguro (HTTP + codificación). */
+const MAX_TOTAL_MB = Number(process.env.MAX_TOTAL_MB || 20);
+const MAX_TOTAL_BYTES = MAX_TOTAL_MB * 1024 * 1024;
+
+/* ──────────────────────────────────────────────────────────────
+   Transporte SMTP (fallback opcional)
+   ────────────────────────────────────────────────────────────── */
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST, // ej: smtp.gmail.com o smtp.office365.com
+  port: Number(process.env.SMTP_PORT || 587), // 587 con STARTTLS
+  secure: (process.env.SMTP_SECURE || "false") === "true", // true solo si usas 465
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 20000,
+  tls: {
+    minVersion: "TLSv1.2",
+    servername: process.env.SMTP_HOST,
+  },
+});
+
+/* Verificación SMTP (solo log informativo) */
+transporter.verify((err) => {
+  if (err) console.error("ERROR VERIFICACIÓN SMTP:", err.message);
+  else console.log("SMTP listo para enviar");
+});
+
+/* ──────────────────────────────────────────────────────────────
+   Helpers para Resend (API HTTP)
+   ────────────────────────────────────────────────────────────── */
+
+/** Buffer -> base64 (para adjuntos por API) */
+function bufToBase64(buf) {
+  return Buffer.isBuffer(buf) ? buf.toString("base64") : Buffer.from(buf).toString("base64");
 }
 
-let activeMailProvider = MAIL_PROVIDER;
-let transporter = null;
+/** Envío por Resend (evita ETIMEDOUT de SMTP en Render) */
+async function sendViaResend({ from, to, subject, html, attachments }) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) throw new Error("Falta RESEND_API_KEY");
 
-if (MAIL_PROVIDER === "resend") {
-  if (!RESEND_API_KEY) {
-    console.error(
-      "MAIL_PROVIDER=resend configurado, pero falta RESEND_API_KEY. Se intentará usar SMTP en su lugar."
-    );
-    activeMailProvider = "smtp";
-  } else if (!fetchFn) {
-    console.error(
-      "MAIL_PROVIDER=resend configurado, pero el runtime no soporta fetch (Node >=18). Se intentará usar SMTP."
-    );
-    activeMailProvider = "smtp";
-  } else {
-    console.log("Usando Resend como proveedor de correo (MAIL_PROVIDER=resend).");
+  const atts = (attachments || []).map((a) => ({
+    filename: a.filename,
+    content: bufToBase64(a.content),
+    contentType: a.contentType || "application/octet-stream",
+  }));
+
+  // Node 20+ ya tiene fetch global en Render
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to, // string o array
+      subject,
+      html,
+      attachments: atts,
+    }),
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Resend ${res.status}: ${body}`);
   }
+  return res.json();
 }
 
-if (activeMailProvider === "smtp") {
-  const missing = [];
-  if (!SMTP_HOST) missing.push("SMTP_HOST");
-  if (!SMTP_USER) missing.push("SMTP_USER");
-  if (!SMTP_PASS) missing.push("SMTP_PASS");
-  if (missing.length) {
-    console.warn(`⚠️ Variables SMTP faltantes: ${missing.join(", ")}.`);
+/* ──────────────────────────────────────────────────────────────
+   ENDPOINTS
+   ────────────────────────────────────────────────────────────── */
+app.get("/", (_req, res) => res.send({ ok: true }));
+
+/** Diagnóstico SMTP: intenta “verify()” con timeout corto */
+app.get("/api/diag/smtp", async (_req, res) => {
+  const timeoutMs = 7000;
+  try {
+    await Promise.race([
+      transporter.verify(),
+      new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), timeoutMs)),
+    ]);
+    res.json({ ok: true, message: "SMTP reachable" });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message || String(e) });
   }
+});
 
-  if (SMTP_HOST) {
-    transporter = nodemailer.createTransport({
-      host: SMTP_HOST,
-      port: SMTP_PORT,
-      secure: SMTP_SECURE,
-      auth: SMTP_USER && SMTP_PASS ? { user: SMTP_USER, pass: SMTP_PASS } : undefined,
-      connectionTimeout: SMTP_CONNECTION_TIMEOUT,
-      socketTimeout: SMTP_SOCKET_TIMEOUT,
-      greetingTimeout: SMTP_GREETING_TIMEOUT,
-      tls: SMTP_IGNORE_TLS
-        ? { rejectUnauthorized: false }
-        : SMTP_HOST
-        ? { servername: SMTP_HOST }
-        : undefined,
-    });
+/**
+ * POST /api/radicaciones
+ * FormData:
+ *  - files: múltiples archivos
+ *  - numero, valor, username, name, email, role, timestamp
+ */
+app.post("/api/radicaciones", upload.array("files", 10), async (req, res) => {
+  try {
+    const { numero, valor, username, name, email, role, timestamp } = req.body;
+    const files = req.files || [];
 
-    transporter
-      .verify()
-      .then(() => console.log("SMTP listo para enviar"))
-      .catch((err) => {
-        console.error("SMTP VERIFY ERROR:", err.message);
-        if (isTimeoutError(err)) {
-          console.error(
-            `No fue posible establecer conexión con ${SMTP_HOST}:${SMTP_PORT}. ` +
-              "Si tu plataforma bloquea SMTP saliente, configura MAIL_PROVIDER=resend y RESEND_API_KEY."
+    if (!files.length) return res.status(400).send("Adjunta al menos 1 archivo.");
+    if (!numero) return res.status(400).send("Falta el número de factura.");
+    if (!valor) return res.status(400).send("Falta el valor.");
+
+    // Validaciones de tipo y peso total
+    let total = 0;
+    for (const f of files) {
+      if (!ALLOWED.has(f.mimetype)) {
+        return res
+          .status(400)
+          .send(
+            `Formato no permitido: "${f.originalname}". Solo PDF, Word (DOC/DOCX) y Excel (XLS/XLSX).`
           );
-        }
+      }
+      total += f.size;
+    }
+    if (total > MAX_TOTAL_BYTES) {
+      return res
+        .status(400)
+        .send(`Tamaño total ${(total / 1024 / 1024).toFixed(1)}MB excede ${MAX_TOTAL_MB}MB.`);
+    }
+
+    // Modo simulación (no envía correo; útil para pruebas)
+    if ((process.env.DRY_RUN || "").toLowerCase() === "true") {
+      console.log("[DRY_RUN] Simulando envío con", files.length, "archivo(s).");
+      return res.json({ ok: true, id: "simulado-" + Date.now(), count: files.length, via: "dry" });
+    }
+
+    const safe = (v) => (v || "").toString().trim();
+    const subject = `Radicación ${safe(numero)} - ${safe(
+      username || name || "usuario"
+    )} (${safe(role || "rol")}) [${files.length} adjunto(s)]`;
+
+    const list = files
+      .map((f) => `<li>${f.originalname} • ${(f.size / 1024 / 1024).toFixed(2)} MB</li>`)
+      .join("");
+
+    const html = `
+      <h3>Radicación de factura</h3>
+      <ul>
+        <li><b>Usuario:</b> ${safe(username)} (${safe(name)})</li>
+        <li><b>Email:</b> ${safe(email)}</li>
+        <li><b>Rol:</b> ${safe(role)}</li>
+        <li><b>Número:</b> ${safe(numero)}</li>
+        <li><b>Valor:</b> ${safe(valor)}</li>
+        <li><b>Fecha:</b> ${safe(timestamp)}</li>
+      </ul>
+      <p><b>Adjuntos (${files.length}):</b></p>
+      <ul>${list}</ul>
+    `;
+
+    const attachments = files.map((f) => ({
+      filename: f.originalname,
+      content: f.buffer,
+      contentType: f.mimetype,
+    }));
+
+    const useResend = (process.env.USE_RESEND || "").toLowerCase() === "true";
+
+    if (useResend) {
+      await sendViaResend({
+        from: process.env.MAIL_FROM,
+        to: process.env.MAIL_TO,
+        subject,
+        html,
+        attachments, // si no quieres adjuntos por API, pásale [] o quítalo
       });
+      return res.json({ ok: true, via: "resend", count: files.length });
+    } else {
+      const info = await transporter.sendMail({
+        from: process.env.MAIL_FROM,
+        to: process.env.MAIL_TO,
+        subject,
+        html,
+        attachments,
+      });
+      return res.json({ ok: true, id: info.messageId, via: "smtp", count: files.length });
+    }
+  } catch (err) {
+    console.error("SENDMAIL ERROR:", err.message, err.response || "", err.code || "");
+    return res.status(500).json({
+      ok: false,
+      error: err.message,
+      detail: err.response || null,
+      code: err.code || null,
+    });
   }
+});
+
+/* ──────────────────────────────────────────────────────────────
+   Servir el frontend (Vite) desde /dist si existe
+   ────────────────────────────────────────────────────────────── */
+const DIST_DIR = path.join(__dirname, "..", "dist");
+if (fs.existsSync(DIST_DIR)) {
+  // Archivos estáticos (assets, js, css, etc.)
+  app.use(express.static(DIST_DIR));
+
+  // SPA fallback: cualquier ruta no-API devuelve index.html
+  app.get("*", (req, res, next) => {
+    if (req.path.startsWith("/api/")) return next();
+    res.sendFile(path.join(DIST_DIR, "index.html"));
+  });
+} else {
+  console.warn("⚠️ No se encontró la carpeta dist. Ejecuta el build del frontend.");
 }
+
+/* ──────────────────────────────────────────────────────────────
+   Arranque
+   ────────────────────────────────────────────────────────────── */
+const PORT = Number(process.env.PORT || 4000);
+app.listen(PORT, () => console.log(`Servidor escuchando en :${PORT}`));
