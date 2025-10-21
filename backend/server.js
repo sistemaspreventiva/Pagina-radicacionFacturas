@@ -11,9 +11,9 @@ const fs = require("fs");
 const app = express();
 
 /* ──────────────────────────────────────────────────────────────
-   CORS (puedes dejar vacío si sirves el front desde el mismo server)
+   CORS
    ────────────────────────────────────────────────────────────── */
-const ORIGIN = process.env.CORS_ORIGIN || ""; // p.ej. http://localhost:5173
+const ORIGIN = process.env.CORS_ORIGIN || ""; // ej: http://localhost:5173,https://tu-dominio
 if (ORIGIN) {
   app.use(
     cors({
@@ -21,40 +21,41 @@ if (ORIGIN) {
       credentials: false,
     })
   );
+} else {
+  app.use(cors());
 }
 
-/* Si tienes otros endpoints JSON */
 app.use(express.json());
 
 /* ──────────────────────────────────────────────────────────────
-   Multer: Memoria (hasta 10 archivos, 15MB cada uno)
+   Multer: archivos en memoria (hasta 10 archivos, 15MB c/u)
    ────────────────────────────────────────────────────────────── */
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 15 * 1024 * 1024, files: 10 },
 });
 
-/* Tipos permitidos: PDF, Word, Excel */
+/* Tipos permitidos */
 const ALLOWED = new Set([
   "application/pdf",
   "application/msword", // .doc
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
   "application/vnd.ms-excel", // .xls
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
-  "application/vnd.ms-excel.sheet.macroEnabled.12", // .xlsm (opcional)
+  "application/vnd.ms-excel.sheet.macroEnabled.12", // .xlsm
 ]);
 
-/* Límite total seguro (HTTP + codificación). */
+/* Límite total recomendado (SMTP/API) */
 const MAX_TOTAL_MB = Number(process.env.MAX_TOTAL_MB || 20);
 const MAX_TOTAL_BYTES = MAX_TOTAL_MB * 1024 * 1024;
 
 /* ──────────────────────────────────────────────────────────────
-   Transporte SMTP (fallback opcional)
+   SMTP (fallback opcional)
    ────────────────────────────────────────────────────────────── */
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST, // ej: smtp.gmail.com o smtp.office365.com
-  port: Number(process.env.SMTP_PORT || 587), // 587 con STARTTLS
-  secure: (process.env.SMTP_SECURE || "false") === "true", // true solo si usas 465
+  host: process.env.SMTP_HOST, // smtp.gmail.com | smtp.office365.com
+  port: Number(process.env.SMTP_PORT || 587),
+  secure: (process.env.SMTP_SECURE || "false") === "true", // true si usas 465
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
@@ -68,22 +69,19 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-/* Verificación SMTP (solo log informativo) */
+// Log informativo (si falla aquí, igual puedes usar Resend)
 transporter.verify((err) => {
   if (err) console.error("ERROR VERIFICACIÓN SMTP:", err.message);
   else console.log("SMTP listo para enviar");
 });
 
 /* ──────────────────────────────────────────────────────────────
-   Helpers para Resend (API HTTP)
+   Helpers Resend (API HTTP) – evita ETIMEDOUT de SMTP
    ────────────────────────────────────────────────────────────── */
-
-/** Buffer -> base64 (para adjuntos por API) */
 function bufToBase64(buf) {
   return Buffer.isBuffer(buf) ? buf.toString("base64") : Buffer.from(buf).toString("base64");
 }
 
-/** Envío por Resend (evita ETIMEDOUT de SMTP en Render) */
 async function sendViaResend({ from, to, subject, html, attachments }) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) throw new Error("Falta RESEND_API_KEY");
@@ -94,7 +92,7 @@ async function sendViaResend({ from, to, subject, html, attachments }) {
     contentType: a.contentType || "application/octet-stream",
   }));
 
-  // Node 20+ ya tiene fetch global en Render
+  // Node 18+ ya trae fetch global (Render usa Node 20/22)
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -120,9 +118,11 @@ async function sendViaResend({ from, to, subject, html, attachments }) {
 /* ──────────────────────────────────────────────────────────────
    ENDPOINTS
    ────────────────────────────────────────────────────────────── */
-app.get("/", (_req, res) => res.send({ ok: true }));
+app.get("/", (_req, res) => res.json({ ok: true }));
 
-/** Diagnóstico SMTP: intenta “verify()” con timeout corto */
+app.get("/api/health", (_req, res) => res.json({ ok: true, ts: Date.now() }));
+
+/** Diagnóstico SMTP muy rápido */
 app.get("/api/diag/smtp", async (_req, res) => {
   const timeoutMs = 7000;
   try {
@@ -151,7 +151,7 @@ app.post("/api/radicaciones", upload.array("files", 10), async (req, res) => {
     if (!numero) return res.status(400).send("Falta el número de factura.");
     if (!valor) return res.status(400).send("Falta el valor.");
 
-    // Validaciones de tipo y peso total
+    // Validaciones
     let total = 0;
     for (const f of files) {
       if (!ALLOWED.has(f.mimetype)) {
@@ -169,7 +169,7 @@ app.post("/api/radicaciones", upload.array("files", 10), async (req, res) => {
         .send(`Tamaño total ${(total / 1024 / 1024).toFixed(1)}MB excede ${MAX_TOTAL_MB}MB.`);
     }
 
-    // Modo simulación (no envía correo; útil para pruebas)
+    // Simulación opcional
     if ((process.env.DRY_RUN || "").toLowerCase() === "true") {
       console.log("[DRY_RUN] Simulando envío con", files.length, "archivo(s).");
       return res.json({ ok: true, id: "simulado-" + Date.now(), count: files.length, via: "dry" });
@@ -212,7 +212,7 @@ app.post("/api/radicaciones", upload.array("files", 10), async (req, res) => {
         to: process.env.MAIL_TO,
         subject,
         html,
-        attachments, // si no quieres adjuntos por API, pásale [] o quítalo
+        attachments,
       });
       return res.json({ ok: true, via: "resend", count: files.length });
     } else {
@@ -237,16 +237,17 @@ app.post("/api/radicaciones", upload.array("files", 10), async (req, res) => {
 });
 
 /* ──────────────────────────────────────────────────────────────
-   Servir el frontend (Vite) desde /dist si existe
+   Servir el frontend (Vite) desde /dist SIN usar '*' (Express 5 OK)
    ────────────────────────────────────────────────────────────── */
 const DIST_DIR = path.join(__dirname, "..", "dist");
 if (fs.existsSync(DIST_DIR)) {
-  // Archivos estáticos (assets, js, css, etc.)
-  app.use(express.static(DIST_DIR));
+  // 1) Assets estáticos
+  app.use(express.static(DIST_DIR, { fallthrough: true }));
 
-  // SPA fallback: cualquier ruta no-API devuelve index.html
-  app.get("*", (req, res, next) => {
-    if (req.path.startsWith("/api/")) return next();
+  // 2) Fallback SPA: middleware SIN rutas comodín
+  app.use((req, res, next) => {
+    if (req.method !== "GET") return next();
+    if (req.path && req.path.startsWith("/api/")) return next();
     res.sendFile(path.join(DIST_DIR, "index.html"));
   });
 } else {
