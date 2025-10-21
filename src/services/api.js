@@ -1,59 +1,29 @@
-// src/services/api.js
-// En producción (Render) usa same-origin. En local puedes definir VITE_API_BASE=http://localhost:4000
-const BASE = (import.meta.env?.VITE_API_BASE || "").trim();
-export const apiBase = BASE ? BASE.replace(/\/$/, "") : "";
+const BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000";
 
-/* ======================= AUTH ======================= */
+export function uploadRadicacion({ file, numero, valor, user }, onProgress) {
+  return new Promise((resolve, reject) => {
+    const form = new FormData();
+    form.append("file", file);
+    form.append("numero", numero);
+    form.append("valor", valor);
+    form.append("username", user?.username || "");
+    form.append("name", user?.name || "");
+    form.append("email", user?.email || "");
+    form.append("role", user?.role || "");
+    form.append("timestamp", new Date().toISOString());
 
-export async function registerUser(payload) {
-  const res = await fetch(`${apiBase}/api/auth/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `${BASE}/api/radicaciones`);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && typeof onProgress === "function") {
+        onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    };
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) resolve(JSON.parse(xhr.responseText));
+      else reject(new Error(xhr.responseText || "Error de carga"));
+    };
+    xhr.onerror = () => reject(new Error("Error de red"));
+    xhr.send(form);
   });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json(); // { ok, token, user }
-}
-
-export async function loginUser({ emailOrUser, password }) {
-  const res = await fetch(`${apiBase}/api/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ emailOrUser, password }),
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json(); // { ok, token, user }
-}
-
-export async function fetchMe(token) {
-  const res = await fetch(`${apiBase}/api/auth/me`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json(); // { ok, user }
-}
-
-/* =================== RADICACIONES =================== */
-
-export async function uploadRadicacion(formDataOrPayload) {
-  // Admite FormData ya armado o un objeto con { files, numero, valor, username, name, email, role, timestamp }
-  let fd;
-  if (formDataOrPayload instanceof FormData) {
-    fd = formDataOrPayload;
-  } else {
-    const { files, numero, valor, username, name, email, role, timestamp } = formDataOrPayload || {};
-    fd = new FormData();
-    Array.from(files || []).forEach((f) => fd.append("files", f));
-    fd.append("numero", String(numero ?? ""));
-    fd.append("valor", String(valor ?? ""));
-    fd.append("username", String(username ?? ""));
-    fd.append("name", String(name ?? ""));
-    fd.append("email", String(email ?? ""));
-    fd.append("role", String(role ?? ""));
-    fd.append("timestamp", String(timestamp ?? new Date().toISOString()));
-  }
-
-  const res = await fetch(`${apiBase}/api/radicaciones`, { method: "POST", body: fd });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json(); // { ok, id, count }
 }

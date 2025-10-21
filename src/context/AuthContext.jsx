@@ -1,61 +1,86 @@
-// src/context/AuthContext.jsx
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
-const AuthContext = createContext(null);
-export const ROLES = ["asistencial", "conductor", "administrativo"];
+const AuthContext = createContext();
 
-function readUsers() {
-  try { return JSON.parse(localStorage.getItem("users") || "[]"); }
-  catch { return []; }
-}
-function writeUsers(list) { localStorage.setItem("users", JSON.stringify(list)); }
+const LS_TOKEN = "token";
+const LS_USER = "currentUser";
+const LS_USERS = "users";
+const ROLES = ["asistencial", "conductor", "administrativo"];
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem(LS_TOKEN));
+  const [user, setUser] = useState(() => {
+    const raw = localStorage.getItem(LS_USER);
+    return raw ? JSON.parse(raw) : null;
+  });
 
   useEffect(() => {
-    const raw = localStorage.getItem("session");
-    if (raw) {
-      const s = JSON.parse(raw);
-      setUser(s.user); setToken(s.token);
+    if (!localStorage.getItem(LS_USERS)) {
+      localStorage.setItem(LS_USERS, JSON.stringify([]));
     }
   }, []);
 
+  const register = ({ name, email, username, password, role }) => {
+    if (!ROLES.includes(role)) throw new Error("Rol inválido");
+    const list = JSON.parse(localStorage.getItem(LS_USERS) || "[]");
+
+    const exists = list.some(
+      u =>
+        u.username.toLowerCase() === username.toLowerCase() ||
+        u.email.toLowerCase() === email.toLowerCase()
+    );
+    if (exists) throw new Error("Usuario o email ya registrado");
+
+    const newUser = {
+      id: crypto.randomUUID(),
+      name,
+      email,
+      username,
+      password,  // solo demo (en backend: hash)
+      role,
+      createdAt: new Date().toISOString(),
+    };
+    list.push(newUser);
+    localStorage.setItem(LS_USERS, JSON.stringify(list));
+    return true;
+  };
+
   const login = (username, password) => {
-    const u = readUsers().find(x => x.username === username && x.password === password);
-    if (!u) return false;
-    const session = { user: u, token: "local-token" };
-    localStorage.setItem("session", JSON.stringify(session));
-    setUser(u); setToken(session.token);
+    const list = JSON.parse(localStorage.getItem(LS_USERS) || "[]");
+    const found = list.find(
+      u => u.username.toLowerCase() === username.toLowerCase() && u.password === password
+    );
+    if (!found) return false;
+
+    const t = "dev-token-" + found.id;
+    setToken(t);
+    const cu = {
+      id: found.id,
+      name: found.name,
+      email: found.email,
+      username: found.username,
+      role: found.role || "asistencial",
+    };
+    setUser(cu);
+    localStorage.setItem(LS_TOKEN, t);
+    localStorage.setItem(LS_USER, JSON.stringify(cu));
     return true;
   };
 
   const logout = () => {
-    localStorage.removeItem("session");
-    setUser(null); setToken(null);
+    setToken(null);
+    setUser(null);
+    localStorage.removeItem(LS_TOKEN);
+    localStorage.removeItem(LS_USER);
   };
 
-  const register = ({ name, email, username, password, role, dni }) => {
-    if (!ROLES.includes(role)) throw new Error("Rol inválido");
-    if (!dni || !/^\d{5,12}$/.test(String(dni))) throw new Error("Cédula/DNI inválido");
-    const list = readUsers();
-    if (list.some(x => x.username === username)) throw new Error("Usuario ya existe");
-    const u = { name, email, username, password, role, dni: String(dni) };
-    list.push(u); writeUsers(list);
-    return true;
-  };
-
-  // ventana de radicación (1-10 para roles no conductores)
-  const canUploadToday = useMemo(() => {
-    if (!user) return false;
-    if (user.role === "conductor") return true;
-    const d = new Date();
-    const day = d.getDate();
-    return day >= 1 && day <= 10;
-  }, [user]);
-
-  const value = { user, token, login, logout, register, ROLES, canUploadToday };
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ token, user, register, login, logout, ROLES }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
-export function useAuth() { return useContext(AuthContext); }
+
+export function useAuth() {
+  return useContext(AuthContext);
+}

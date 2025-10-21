@@ -1,151 +1,93 @@
 import { useState } from "react";
-import { registerUser } from "../services/api";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
 
 export default function Register() {
+  const { register, ROLES } = useAuth();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [pass, setPass] = useState("");
+  const [pass2, setPass2] = useState("");
+  const [role, setRole] = useState("asistencial");
+  const [err, setErr] = useState("");
+  const [ok, setOk] = useState("");
   const nav = useNavigate();
-  const [form, setForm] = useState({
-    email: "",
-    username: "",
-    password: "",
-    dni: "",
-    role: "asistencial",
-  });
-  const [msg, setMsg] = useState(null);
-  const [loading, setLoading] = useState(false);
 
-  function onChange(e) {
-    const { name, value } = e.target;
-    setForm((s) => ({ ...s, [name]: value }));
-  }
-
-  async function onSubmit(e) {
+  const onSubmit = (e) => {
     e.preventDefault();
-    setMsg(null);
-    if (!form.email || !form.username || !form.password) {
-      setMsg({ type: "error", text: "Completa email, usuario y contraseña." });
-      return;
-    }
+    setErr(""); setOk("");
+    if (!name || !email || !username || !pass) return setErr("Completa todos los campos");
+    if (pass.length < 6) return setErr("La contraseña debe tener al menos 6 caracteres");
+    if (pass !== pass2) return setErr("Las contraseñas no coinciden");
+    if (!ROLES.includes(role)) return setErr("Selecciona un rol válido");
+
     try {
-      setLoading(true);
-      const { token, user } = await registerUser(form);
-      localStorage.setItem("token", token);
-      setMsg({ type: "ok", text: `Usuario creado: ${user.username}` });
-      setTimeout(() => nav("/dashboard"), 500);
-    } catch (err) {
-      setMsg({ type: "error", text: err.message || "Error registrando." });
-    } finally {
-      setLoading(false);
+      register({ name, email, username, password: pass, role });
+      setOk("Registro exitoso. Ahora puedes iniciar sesión.");
+      setTimeout(() => nav("/"), 700);
+    } catch (ex) {
+      setErr(ex.message || "No se pudo registrar");
     }
-  }
+  };
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-10 grid md:grid-cols-2 gap-10 items-center">
-      <div className="hidden md:block">
-        <div className="rounded-2xl bg-[var(--p-prim)]/5 p-8 border border-[var(--p-prim)]/10">
-          <h2 className="text-2xl font-semibold text-slate-800 mb-2">
-            Crea tu cuenta
-          </h2>
-          <p className="text-slate-600">
-            Para roles asistencial y administrativo: cargue del 1 al 10 de cada mes. Conductores: todo el mes.
-          </p>
-        </div>
-      </div>
+    <main className="min-h-[calc(100vh-48px)] grid place-items-center bg-slate-50">
+      <form onSubmit={onSubmit} className="bg-white p-6 rounded-2xl shadow border w-[28rem] space-y-3">
+        <h1 className="text-xl font-bold text-[color:var(--ps-navy)]">Crear cuenta</h1>
+        {err && <p className="text-sm text-red-600">{err}</p>}
+        {ok && <p className="text-sm text-green-700">{ok}</p>}
 
-      <div className="max-w-md w-full mx-auto">
-        <h1 className="text-xl font-semibold mb-4 text-slate-800">Registro</h1>
-
-        {msg && (
-          <div
-            className={`mb-4 rounded-md border p-3 ${
-              msg.type === "ok"
-                ? "border-green-300 bg-green-50 text-green-800"
-                : "border-red-300 bg-red-50 text-red-800"
-            }`}
-          >
-            {msg.text}
-          </div>
-        )}
-
-        <form onSubmit={onSubmit} className="space-y-4">
+        <div className="grid grid-cols-1 gap-3">
           <div>
-            <label className="block text-sm mb-1">Email *</label>
-            <input
-              className="w-full rounded-md border px-3 py-2"
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={onChange}
-              placeholder="correo@dominio.com"
-            />
+            <label className="block text-sm mb-1">Nombre completo</label>
+            <input className="w-full border rounded px-3 py-2" value={name} onChange={(e)=>setName(e.target.value)} />
+          </div>
+          <div>
+            <label className="block text-sm mb-1">Email</label>
+            <input type="email" className="w-full border rounded px-3 py-2" value={email} onChange={(e)=>setEmail(e.target.value)} />
+          </div>
+          <div>
+            <label className="block text-sm mb-1">Usuario</label>
+            <input className="w-full border rounded px-3 py-2" value={username} onChange={(e)=>setUsername(e.target.value)} />
           </div>
 
           <div>
-            <label className="block text-sm mb-1">Usuario *</label>
-            <input
-              className="w-full rounded-md border px-3 py-2"
-              type="text"
-              name="username"
-              value={form.username}
-              onChange={onChange}
-              placeholder="usuario"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm mb-1">Contraseña *</label>
-            <input
-              className="w-full rounded-md border px-3 py-2"
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={onChange}
-              placeholder="••••••••"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm mb-1">DNI / Cédula</label>
-            <input
-              className="w-full rounded-md border px-3 py-2"
-              type="text"
-              name="dni"
-              value={form.dni}
-              onChange={onChange}
-              placeholder="Opcional"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm mb-1">Rol *</label>
+            <label className="block text-sm mb-1">Rol</label>
             <select
-              className="w-full rounded-md border px-3 py-2"
-              name="role"
-              value={form.role}
-              onChange={onChange}
+              className="w-full border rounded px-3 py-2 bg-white"
+              value={role}
+              onChange={(e)=>setRole(e.target.value)}
             >
               <option value="asistencial">Asistencial</option>
-              <option value="administrativo">Administrativo</option>
               <option value="conductor">Conductor</option>
+              <option value="administrativo">Administrativo (no sistemas)</option>
             </select>
+            <p className="text-xs text-slate-500 mt-1">
+              Asistencial/Administrativo: del 1 al 10. Conductor: todo el mes.
+            </p>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="rounded-md bg-[var(--p-prim)] hover:bg-[var(--p-prim-600)] text-white px-4 py-2"
-          >
-            {loading ? "Creando..." : "Crear cuenta"}
-          </button>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm mb-1">Contraseña</label>
+              <input type="password" className="w-full border rounded px-3 py-2" value={pass} onChange={(e)=>setPass(e.target.value)} />
+            </div>
+            <div>
+              <label className="block text-sm mb-1">Repetir contraseña</label>
+              <input type="password" className="w-full border rounded px-3 py-2" value={pass2} onChange={(e)=>setPass2(e.target.value)} />
+            </div>
+          </div>
+        </div>
 
-          <p className="text-sm mt-2">
-            ¿Ya tienes cuenta?{" "}
-            <Link to="/login" className="text-[var(--p-sec)] underline">
-              Inicia sesión
-            </Link>
-          </p>
-        </form>
-      </div>
-    </section>
+        <button className="w-full bg-sky-600 hover:bg-sky-700 text-white py-2 rounded-lg">
+          Registrarme
+        </button>
+        <p className="text-sm text-slate-600">
+          ¿Ya tienes cuenta?{" "}
+          <Link className="text-[color:var(--ps-orange)] hover:underline" to="/">Inicia sesión</Link>
+        </p>
+      </form>
+    </main>
   );
 }

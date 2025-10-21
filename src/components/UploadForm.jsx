@@ -1,218 +1,102 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { uploadRadicacion } from "../services/api";
 
-// Consecutivo DS"DD/YYYY-CC"
-function generarConsecutivo() {
-  const now = new Date();
-  const dia = String(now.getDate()).padStart(2, "0");
-  const anio = String(now.getFullYear());
-  return `DS"${dia}/${anio}-CC"`;
-}
+const MAX_MB = 15;
+const ALLOWED = ["application/pdf", "image/jpeg", "image/png", "image/jpg"];
 
-// Calendario: 1–10 para asistencial/administrativo; todo el mes conductor
-function calendarioHabilitado(role) {
-  const hoy = new Date().getDate();
-  if (role === "conductor") return true;
-  return hoy >= 1 && hoy <= 10;
-}
-
-export default function UploadForm() {
-  const [files, setFiles] = useState([]);
+export default function UploadForm({ canUpload, user }) {
+  const [file, setFile] = useState(null);
+  const [numero, setNumero] = useState("");
   const [valor, setValor] = useState("");
-  const [username, setUsername] = useState("");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState("asistencial");
-  const [dni, setDni] = useState(""); // informativo
-  const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState(null);
+  const [err, setErr] = useState("");
+  const [ok, setOk] = useState("");
+  const [progress, setProgress] = useState(0);
+  const [sending, setSending] = useState(false);
 
-  const numero = useMemo(() => generarConsecutivo(), []); // solo lectura
-  const habilitado = calendarioHabilitado(role);
+  function onPick(e) {
+    setErr(""); setOk("");
+    const f = e.target.files?.[0];
+    if (!f) return setFile(null);
+    if (!ALLOWED.includes(f.type)) { setErr("Formato no permitido. Solo PDF/JPG/PNG."); return setFile(null); }
+    if (f.size > MAX_MB * 1024 * 1024) { setErr(`Archivo muy grande (máx ${MAX_MB} MB).`); return setFile(null); }
+    setFile(f);
+  }
 
   async function onSubmit(e) {
     e.preventDefault();
-    setMsg(null);
-
-    if (!habilitado) {
-      setMsg({ type: "error", text: "Calendario cerrado para tu rol (habilitado 1–10 del mes)." });
-      return;
-    }
-    if (!files || files.length === 0) {
-      setMsg({ type: "error", text: "Adjunta al menos un archivo (PDF/Word/Excel)." });
-      return;
-    }
-    if (!valor) {
-      setMsg({ type: "error", text: "Ingresa el valor de la factura." });
-      return;
-    }
+    setErr(""); setOk("");
+    if (!canUpload) return setErr("Fuera de ventana de radicación.");
+    if (!file) return setErr("Adjunta un archivo.");
+    if (!numero) return setErr("Ingresa el número de factura.");
+    if (!valor) return setErr("Ingresa el valor.");
 
     try {
-      setLoading(true);
-      const data = await uploadRadicacion({
-        files,
-        numero,
-        valor,
-        username,
-        name,
-        email,
-        role,
-        timestamp: new Date().toISOString(),
-      });
-      setMsg({ type: "ok", text: `Enviado ✅ (ID: ${data.id}) - Adjuntos: ${data.count}` });
-      setFiles([]);
-      setValor("");
-    } catch (err) {
-      setMsg({ type: "error", text: err.message || "Error enviando radicación." });
+      setSending(true);
+      setProgress(0);
+      const res = await uploadRadicacion({ file, numero, valor, user }, (p) => setProgress(p));
+      setOk(`Radicación enviada. ID: ${res.id || "N/A"}`);
+      setFile(null); setNumero(""); setValor("");
+    } catch (ex) {
+      setErr(ex.message || "No se pudo enviar.");
     } finally {
-      setLoading(false);
+      setSending(false);
+      setTimeout(() => setProgress(0), 800);
     }
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
-      <h1 className="text-2xl font-semibold mb-2 text-slate-800">Subir Radicación</h1>
-      <p className="text-sm mb-6 opacity-80">
-        {role === "conductor"
-          ? "Conductores: habilitado todo el mes."
-          : "Asistencial/Administrativo: habilitado del 1 al 10 de cada mes."}
-      </p>
+    <form onSubmit={onSubmit} className="space-y-3">
+      {err && <p className="text-sm text-red-600">{err}</p>}
+      {ok && <p className="text-sm text-green-700">{ok}</p>}
 
-      {!habilitado && (
-        <div className="mb-4 rounded-md border border-red-300 bg-red-50 p-3 text-red-800">
-          Calendario cerrado para tu rol en este momento.
-        </div>
-      )}
+      <div>
+        <label className="block text-sm mb-1">Factura / Cuenta de cobro</label>
+        <input
+          type="file"
+          accept=".pdf,image/*"
+          onChange={onPick}
+          className="w-full border rounded px-3 py-2 bg-white disabled:opacity-60"
+          disabled={!canUpload || sending}
+        />
+        <p className="text-xs text-slate-500 mt-1">PDF, JPG o PNG. Máx {MAX_MB} MB.</p>
+      </div>
 
-      {msg && (
-        <div
-          className={`mb-4 rounded-md border p-3 ${
-            msg.type === "ok"
-              ? "border-green-300 bg-green-50 text-green-800"
-              : "border-red-300 bg-red-50 text-red-800"
-          }`}
-        >
-          {msg.text}
-        </div>
-      )}
-
-      <form onSubmit={onSubmit} className="space-y-4">
-        {/* Consecutivo solo lectura */}
+      <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-sm mb-1">Consecutivo</label>
+          <label className="block text-sm mb-1">Número de factura</label>
           <input
-            className="w-full rounded-md border px-3 py-2 bg-gray-100"
-            type="text"
             value={numero}
-            readOnly
+            onChange={(e)=>setNumero(e.target.value)}
+            className="w-full border rounded px-3 py-2"
+            placeholder="FAC-0001"
+            disabled={!canUpload || sending}
           />
         </div>
-
-        {/* DNI / Cédula */}
-        <div>
-          <label className="block text-sm mb-1">DNI / Cédula</label>
-          <input
-            className="w-full rounded-md border px-3 py-2"
-            type="text"
-            value={dni}
-            onChange={(e) => setDni(e.target.value)}
-            placeholder="Ingrese su DNI/Cédula"
-          />
-        </div>
-
-        {/* Rol */}
-        <div>
-          <label className="block text-sm mb-1">Rol</label>
-          <select
-            className="w-full rounded-md border px-3 py-2"
-            value={role}
-            onChange={(e) => e.target.value && setRole(e.target.value)}
-          >
-            <option value="asistencial">Asistencial</option>
-            <option value="administrativo">Administrativo</option>
-            <option value="conductor">Conductor</option>
-          </select>
-        </div>
-
-        {/* Usuario / Nombre / Email */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div>
-            <label className="block text-sm mb-1">Usuario</label>
-            <input
-              className="w-full rounded-md border px-3 py-2"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="usuario"
-            />
-          </div>
-          <div>
-            <label className="block text-sm mb-1">Nombre</label>
-            <input
-              className="w-full rounded-md border px-3 py-2"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Nombre completo"
-            />
-          </div>
-          <div>
-            <label className="block text-sm mb-1">Email</label>
-            <input
-              className="w-full rounded-md border px-3 py-2"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="correo@ejemplo.com"
-            />
-          </div>
-        </div>
-
-        {/* Valor */}
         <div>
           <label className="block text-sm mb-1">Valor</label>
           <input
-            className="w-full rounded-md border px-3 py-2"
-            type="number"
-            min={0}
-            step="0.01"
             value={valor}
-            onChange={(e) => setValor(e.target.value)}
-            placeholder="Ej: 1230000"
+            onChange={(e)=>setValor(e.target.value)}
+            className="w-full border rounded px-3 py-2"
+            placeholder="$0"
+            disabled={!canUpload || sending}
           />
         </div>
+      </div>
 
-        {/* Archivos */}
-        <div>
-          <label className="block text-sm mb-1">Adjuntos (PDF/Word/Excel)</label>
-          <input
-            className="w-full rounded-md border px-3 py-2"
-            type="file"
-            multiple
-            accept=".pdf,.doc,.docx,.xls,.xlsx,.xlsm,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.macroEnabled.12"
-            onChange={(e) => setFiles(Array.from(e.target.files || []))}
-          />
-          {files?.length > 0 && (
-            <p className="text-sm mt-1 opacity-80">
-              {files.length} archivo(s) seleccionados.
-            </p>
-          )}
+      {progress > 0 && (
+        <div className="w-full bg-slate-200 rounded-full h-2">
+          <div className="h-2 rounded-full bg-sky-600 transition-all" style={{ width: `${progress}%` }} />
         </div>
+      )}
 
-        <div className="pt-2">
-          <button
-            type="submit"
-            disabled={loading || !habilitado}
-            className={`rounded-md px-4 py-2 text-white ${
-              habilitado
-                ? "bg-[var(--p-prim)] hover:bg-[var(--p-prim-600)]"
-                : "bg-gray-400 cursor-not-allowed"
-            }`}
-          >
-            {loading ? "Enviando..." : "Enviar radicación"}
-          </button>
-        </div>
-      </form>
-    </div>
+      <button
+        type="submit"
+        className={`w-full rounded-lg py-2 font-semibold text-white ${canUpload ? "bg-sky-600 hover:bg-sky-700" : "bg-slate-400 cursor-not-allowed"}`}
+        disabled={!canUpload || sending}
+      >
+        {sending ? "Enviando..." : canUpload ? "Enviar" : "Fuera de ventana"}
+      </button>
+    </form>
   );
 }
