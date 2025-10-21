@@ -1,7 +1,8 @@
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import Login from "../pages/Login.jsx";
-import Register from "../pages/Register.jsx";   // <-- default
+import Register from "../pages/Register.jsx";
 import Dashboard from "../pages/Dashboard.jsx";
+import Instructivo from "../pages/Instructivo.jsx"; // ← NUEVO
 import { useAuth } from "../context/AuthContext.jsx";
 
 function ProtectedRoute() {
@@ -14,6 +15,7 @@ export default function AppRoutes() {
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/instructivo" element={<Instructivo />} /> {/* ← NUEVO (pública) */}
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
       </Route>

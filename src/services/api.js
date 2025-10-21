@@ -1,9 +1,11 @@
-const BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000";
+// Si VITE_API_BASE existe, úsalo (dev). Si no, usa misma origin (prod monolito)
+const BASE = (import.meta.env?.VITE_API_BASE || "").trim();
+const apiBase = BASE ? BASE.replace(/\/$/, "") : ""; // "" => misma origin
 
-export function uploadRadicacion({ file, numero, valor, user }, onProgress) {
+export function uploadRadicacion({ files, numero, valor, user }, onProgress) {
   return new Promise((resolve, reject) => {
     const form = new FormData();
-    form.append("file", file);
+    (files || []).forEach((f) => form.append("files", f));
     form.append("numero", numero);
     form.append("valor", valor);
     form.append("username", user?.username || "");
@@ -13,7 +15,7 @@ export function uploadRadicacion({ file, numero, valor, user }, onProgress) {
     form.append("timestamp", new Date().toISOString());
 
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", `${BASE}/api/radicaciones`);
+    xhr.open("POST", `${apiBase}/api/radicaciones`);
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable && typeof onProgress === "function") {
         onProgress(Math.round((e.loaded / e.total) * 100));

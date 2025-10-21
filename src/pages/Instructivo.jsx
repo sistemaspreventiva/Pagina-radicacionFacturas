@@ -42,7 +42,7 @@ export default function Instructivo() {
           Instructivo de Radicación de Facturas
         </h1>
         <p className="text-slate-600">
-          Descarga los formatos oficiales según tu rol. Coloca los archivos en <code>xxxxxxxxxxxx/&lt;rol&gt;/</code>.
+          Descarga los formatos oficiales según tu rol. Coloca los archivos en <code>/public/formatos/&lt;rol&gt;/</code>.
         </p>
       </header>
 

@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth, ROLES } from "../context/AuthContext.jsx";
 
 export default function Register() {
-  const { register, ROLES } = useAuth();
+  const { register } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [dni, setDni] = useState("");              // ← nuevo
   const [username, setUsername] = useState("");
   const [pass, setPass] = useState("");
   const [pass2, setPass2] = useState("");
@@ -17,15 +18,13 @@ export default function Register() {
   const onSubmit = (e) => {
     e.preventDefault();
     setErr(""); setOk("");
-    if (!name || !email || !username || !pass) return setErr("Completa todos los campos");
-    if (pass.length < 6) return setErr("La contraseña debe tener al menos 6 caracteres");
+    if (!name || !email || !dni || !username || !pass) return setErr("Completa todos los campos");
+    if (!/^\d{5,12}$/.test(dni)) return setErr("Cédula/DNI: 5-12 dígitos");
     if (pass !== pass2) return setErr("Las contraseñas no coinciden");
-    if (!ROLES.includes(role)) return setErr("Selecciona un rol válido");
-
     try {
-      register({ name, email, username, password: pass, role });
+      register({ name, email, username, password: pass, role, dni });
       setOk("Registro exitoso. Ahora puedes iniciar sesión.");
-      setTimeout(() => nav("/"), 700);
+      setTimeout(() => nav("/"), 800);
     } catch (ex) {
       setErr(ex.message || "No se pudo registrar");
     }
@@ -47,25 +46,30 @@ export default function Register() {
             <label className="block text-sm mb-1">Email</label>
             <input type="email" className="w-full border rounded px-3 py-2" value={email} onChange={(e)=>setEmail(e.target.value)} />
           </div>
+
+          {/* DNI/Cédula */}
+          <div>
+            <label className="block text-sm mb-1">Cédula / DNI</label>
+            <input
+              className="w-full border rounded px-3 py-2"
+              value={dni}
+              onChange={(e)=>setDni(e.target.value.replace(/\D/g,""))}
+              placeholder="Solo números"
+            />
+            <p className="text-xs text-slate-500 mt-1">
+              Se usará para generar el consecutivo automático (DSDDYY-CC).
+            </p>
+          </div>
+
           <div>
             <label className="block text-sm mb-1">Usuario</label>
             <input className="w-full border rounded px-3 py-2" value={username} onChange={(e)=>setUsername(e.target.value)} />
           </div>
-
           <div>
             <label className="block text-sm mb-1">Rol</label>
-            <select
-              className="w-full border rounded px-3 py-2 bg-white"
-              value={role}
-              onChange={(e)=>setRole(e.target.value)}
-            >
-              <option value="asistencial">Asistencial</option>
-              <option value="conductor">Conductor</option>
-              <option value="administrativo">Administrativo (no sistemas)</option>
+            <select className="w-full border rounded px-3 py-2 bg-white" value={role} onChange={(e)=>setRole(e.target.value)}>
+              {ROLES.map(r => <option key={r} value={r}>{r[0].toUpperCase()+r.slice(1)}</option>)}
             </select>
-            <p className="text-xs text-slate-500 mt-1">
-              Asistencial/Administrativo: del 1 al 10. Conductor: todo el mes.
-            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -80,12 +84,9 @@ export default function Register() {
           </div>
         </div>
 
-        <button className="w-full bg-sky-600 hover:bg-sky-700 text-white py-2 rounded-lg">
-          Registrarme
-        </button>
+        <button className="w-full bg-sky-600 hover:bg-sky-700 text-white py-2 rounded-lg">Registrarme</button>
         <p className="text-sm text-slate-600">
-          ¿Ya tienes cuenta?{" "}
-          <Link className="text-[color:var(--ps-orange)] hover:underline" to="/">Inicia sesión</Link>
+          ¿Ya tienes cuenta? <Link className="text-[color:var(--ps-orange)] hover:underline" to="/">Inicia sesión</Link>
         </p>
       </form>
     </main>

@@ -1,4 +1,3 @@
-// src/lib/consecutivo.js
 export function genConsecutivo(dni, date = new Date()) {
   const dd = String(date.getDate()).padStart(2, "0");
   const yy = String(date.getFullYear()).slice(-2);
