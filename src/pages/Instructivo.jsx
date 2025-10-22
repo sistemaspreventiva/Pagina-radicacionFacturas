@@ -5,7 +5,7 @@ export default function Instructivo() {
   return (
     <main className="max-w-6xl mx-auto px-4 py-10">
       <h1 className="text-3xl font-bold mb-6">
-        Instructivos de Radicación de Cuentas de cobro
+        Instructivos de Radicación de Cuentas de cobro.
       </h1>
 
       <p className="text-slate-600 mb-8">
