@@ -152,7 +152,7 @@ export default function UploadForm({ canUpload, user }) {
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-sm mb-1">Número de factura</label>
+          <label className="block text-sm mb-1">Número de cuenta de cobro</label>
           <input
             value={numero}
             readOnly                              // ← ahora es solo lectura

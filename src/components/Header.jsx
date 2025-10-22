@@ -22,7 +22,7 @@ export default function Header() {
             <img src="/logo-preventiva.png" alt="" className="h-9 w-auto" onError={(e)=>e.currentTarget.style.display="none"} />
             <div className="leading-tight">
               <p className="text-[11px] uppercase tracking-wide text-[color:rgba(10,42,77,.7)]">Preventiva Salud IPS</p>
-              <h1 className="text-sm font-semibold text-[color:var(--ps-navy)]">Radicación de Facturas</h1>
+              <h1 className="text-sm font-semibold text-[color:var(--ps-navy)]">Radicación de Cuentas de Cobro</h1>
             </div>
           </NavLink>
 

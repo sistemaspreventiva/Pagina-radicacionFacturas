@@ -24,7 +24,7 @@ export default function Login() {
           <h2 className="text-3xl font-bold text-[color:var(--ps-navy)]">
             Bienvenido a{" "}
             <span className="bg-gradient-to-r from-[var(--ps-cyan)] via-[var(--ps-blue)] to-[var(--ps-orange)] bg-clip-text text-transparent">
-              Radicación de Facturas
+              Radicación de Cuentas de Cobro
             </span>
           </h2>
           <p className="text-[color:rgba(10,42,77,.7)]">Preventiva Salud IPS</p>
@@ -59,7 +59,7 @@ export default function Login() {
               <div className="absolute inset-0 ring-1 ring-white/30"></div>
             </div>
             <p className="mt-3 text-sm text-slate-600">
-              Suba sus facturas de forma segura los primeros 10 días de cada mes.
+              Suba su cuenta de cobro de forma segura los primeros 10 días de cada mes.
             </p>
           </div>
         </div>
