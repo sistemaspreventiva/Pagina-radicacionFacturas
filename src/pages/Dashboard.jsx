@@ -82,7 +82,7 @@ export default function Dashboard() {
 
         {/* Formulario de radicación */}
         <div className="p-4 rounded-2xl border bg-white">
-          <h3 className="font-semibold text-[color:var(--ps-navy)]">Radicar factura</h3>
+          <h3 className="font-semibold text-[color:var(--ps-navy)]">Radicar cuenta de cobro</h3>
           <p className="text-xs text-slate-500 mb-3">Destino: contabilidad@preventivaips.com.co</p>
           <UploadForm canUpload={canUploadToday} user={user} />
         </div>

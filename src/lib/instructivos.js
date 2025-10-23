@@ -52,7 +52,7 @@ export const instructivos = {
     {
       titulo: "FO-GH-029 PLANTILLA CUENTA DE COBRO TRANSPORTE v01 (DOCX)",
       href:
-        "/conductores/FO-GH-029 PLANTILLA CUENTA DE COBRO TRANSPORTE v01.docx",
+        "/FO-GH-025 INFORME DE EJECUCIÓN DE ACTIVIDADES CONTRACTUALES v01.docx",
     },
     {
       titulo:
