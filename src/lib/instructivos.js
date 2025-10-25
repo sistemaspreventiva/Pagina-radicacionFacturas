@@ -47,18 +47,18 @@ export const instructivos = {
       titulo:
         "FO-GH-029 PLANTILLA CUENTA DE COBRO TRANSPORTE v01.docx (DOCX)",
       href:
-        "/FO-GH-029 PLANTILLA CUENTA DE COBRO TRANSPORTE v01.docx",
+        "/conductores/FO-GH-029 PLANTILLA CUENTA DE COBRO TRANSPORTE v01.docx",
     },
     {
       titulo: "FO-GH-031_RELACIÓN_DE_SERVICIOS-CONDUCTORES_v01 (xlsx)",
       href:
-        "/FO-GH-031_RELACIÓN_DE_SERVICIOS-CONDUCTORES_v01.xlsx",
+        "/conductores/FO-GH-031_RELACIÓN_DE_SERVICIOS-CONDUCTORES_v01.xlsx",
     },
     {
       titulo:
         "IN-GH-003 INSTRUCTIVO COTIZACION SEGURIDAD SOCIAL INDEPENDIENTES v01 (PDF)",
       href:
-        "/IN-GH-003 INSTRUCTIVO COTIZACION SEGURIDAD SOCIAL INDEPENDIENTES v01.pdf",
+        "/conductores/IN-GH-003 INSTRUCTIVO COTIZACION SEGURIDAD SOCIAL INDEPENDIENTES v01.pdf",
     },
   ],
 };
