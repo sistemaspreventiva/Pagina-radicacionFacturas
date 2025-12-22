@@ -59,7 +59,7 @@ export default function Login() {
               <div className="absolute inset-0 ring-1 ring-white/30"></div>
             </div>
             <p className="mt-3 text-sm text-slate-600">
-              Suba su cuenta de cobro de forma segura los primeros 10 días de cada mes.
+              Suba sus cuentas de cobro de forma segura los primeros 10 días de cada mes.
             </p>
           </div>
         </div>
