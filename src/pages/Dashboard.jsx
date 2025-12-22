@@ -36,7 +36,7 @@ export default function Dashboard() {
       <div className="mt-4 p-3 rounded-xl border bg-white">
         {role === "conductor" ? (
           <p className="text-green-700">
-            Para tu rol (<b>Conductor</b>) la radicación está <b>habilitada todo el mes</b>.
+            Para tu rol (<b>Conductor</b>) la radicación está <b>habilitada del 1 al 10 de cada mes</b>.
           </p>
         ) : (
           <p className="text-slate-700">

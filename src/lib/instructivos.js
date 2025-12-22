@@ -4,61 +4,43 @@
 export const instructivos = {
   administrativo: [
     {
-      titulo: "FO-GH-025 INFORME DE EJECUCIÓN DE ACTIVIDADES CONTRACTUALES v01 (DOCX)",
+      titulo: "FO-GH-025 INFORME DE EJECUCIÓN DE ACTIVIDADES CONTRACTUALES Docx",
       href:
-        "/Administrativo/FO-GH-025 INFORME DE EJECUCIÓN DE ACTIVIDADES CONTRACTUALES v01.docx",
+        "/Administrativo/FO-GH-025 INFORME DE EJECUCIÓN DE ACTIVIDADES CONTRACTUALES v02.docx",
     },
     {
-      titulo: "FO-GH-029 PLANTILLA CUENTA DE COBRO ADMINISTRATIVO v01 (DOCX)",
+      titulo: "FO-GH-033 PLANTILLA CUENTA DE COBRO ADMINISTRATIVO Docx",
       href:
-        "/Administrativo/FO-GH-029 PLANTILLA CUENTA DE COBRO ADMINISTRATIVO v01.docx",
-    },
-    {
-      titulo:
-        "IN-GH-003 INSTRUCTIVO COTICACION SEGURIDAD SOCIAL INDEPENDIENTES v01 (PDF)",
-      href:
-        "/Administrativo/IN-GH-003 INSTRUCTIVO COTIZACION SEGURIDAD SOCIAL INDEPENDIENTES v01.pdf",
+        "/Administrativo/FO-GH-033 PLANTILLA CUENTA DE COBRO ADMINISTRATIVO v01.docx",
     },
   ],
 
   asistencial: [
     {
       titulo:
-        "FO-GH-030 PLANTILLA CUENTA DE COBRO RELACION DE PACIENTES v01 (XLSX)",
+        "FO-GH-030 PLANTILLA_RELACION_DE_PACIENTES_v02 (XLSX)",
       href:
-        "/Asistencial/FO-GH-030 PLANTILLA CUENTA DE COBRO RELACION DE PACIENTES v01.xlsx",
+        "/Asistencial/FO-GH-030 PLANTILLA_RELACION_DE_PACIENTES_v02.xlsx",
     },
     {
       titulo:
         "IN-GH-002 INSTRUCTIVO CUENTA DE COBRO PERSONAL ASISTENCIAL v01 (PDF)",
       href:
-        "/Asistencial/IN-GH-002 INSTRUCTIVO CUENTA DE COBRO PERSONAL ASISTENCIAL v01.pdf",
-    },
-    {
-      titulo:
-        "IN-GH-003 INSTRUCTIVO COTICACION SEGURIDAD SOCIAL INDEPENDIENTES v01 (PDF)",
-      href:
-        "/Asistencial/IN-GH-003 INSTRUCTIVO COTIZACION SEGURIDAD SOCIAL INDEPENDIENTES v01.pdf",
+        "/Asistencial/FO-GH-032 PLANTILLA CUENTA DE COBRO ASISTENCIAL v01.docx",
     },
   ],
 
   conductores: [
     {
       titulo:
-        "FO-GH-029 PLANTILLA CUENTA DE COBRO TRANSPORTE v01.docx (DOCX)",
+        "FO-GH-029 PLANTILLA CUENTA DE COBRO CONDUCTORES v02 (DOCX)",
       href:
-        "/conductores/FO-GH-029 PLANTILLA CUENTA DE COBRO TRANSPORTE v01.docx",
+        "/conductores/FO-GH-029 PLANTILLA CUENTA DE COBRO CONDUCTORES v02.docx",
     },
     {
-      titulo: "FO-GH-031_RELACIÓN_DE_SERVICIOS-CONDUCTORES_v01 (xlsx)",
+      titulo: "FO-GH-031 RELACIÓN_DE_SERVICIOS-CONDUCTORES_v02 (xlsx)",
       href:
-        "/conductores/FO-GH-031_RELACIÓN_DE_SERVICIOS-CONDUCTORES_v01.xlsx",
-    },
-    {
-      titulo:
-        "IN-GH-003 INSTRUCTIVO COTIZACION SEGURIDAD SOCIAL INDEPENDIENTES v01 (PDF)",
-      href:
-        "/conductores/IN-GH-003 INSTRUCTIVO COTIZACION SEGURIDAD SOCIAL INDEPENDIENTES v01.pdf",
+        "/conductores/FO-GH-031 RELACIÓN_DE_SERVICIOS-CONDUCTORES_v02.xlsx",
     },
   ],
 };

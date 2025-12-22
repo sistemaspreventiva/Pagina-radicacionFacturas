@@ -163,7 +163,7 @@ export default function UploadForm({ canUpload, user }) {
             title="Autogenerado con tu cédula y fecha; no editable"
           />
           <p className="text-xs text-slate-500 mt-1">
-            Formato: DSDDYY-CC (se autogenera con tu cédula al abrir el formulario).
+            Formato: DSMMYY-CC (se autogenera con tu cédula al abrir el formulario).
           </p>
         </div>
         <div>
