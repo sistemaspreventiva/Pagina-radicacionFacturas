@@ -64,7 +64,7 @@ export default function Instructivo() {
           BLOQUE 2 — DESCARGAS POR ROL (ABAJO)
          ================================================== */}
       <h2 className="text-2xl font-semibold mb-6">
-        Formatos según tipo de usuario
+        Formatos según tipo de usuarios
       </h2>
 
       <section className="grid md:grid-cols-3 gap-6">
