@@ -70,6 +70,7 @@ export default function Instructivo() {
       <section className="grid md:grid-cols-3 gap-6">
         <Card
           titulo="Asistencial"
+        
           descripcion="Formatos y guías para personal asistencial. Radicación del 1 al 10 de cada mes."
           items={Array.isArray(instructivos.asistencial) ? instructivos.asistencial : []}
           color="border-cyan-500"
@@ -101,7 +102,7 @@ function DocLink({ titulo, href }) {
       download
       className="flex items-center justify-between rounded-lg border px-4 py-3 hover:bg-slate-50"
     >
-      <span>📄 {titulo}</span>
+      <span>📕 {titulo}</span>
       <span className="text-sm text-slate-500">PDF · Descargar</span>
     </a>
   );
