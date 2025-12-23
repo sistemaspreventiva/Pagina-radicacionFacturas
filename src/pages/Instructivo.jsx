@@ -31,7 +31,7 @@ export default function Instructivo() {
           <div className="w-full aspect-video rounded-lg overflow-hidden border">
             <iframe
               className="w-full h-full"
-              src="https://www.youtube.com/embed/TU_ID_DE_VIDEO"
+              src="https://youtu.be/tQjPxt9vAKA"
               title="Video instructivo de radicación"
               frameBorder="0"
               allowFullScreen
