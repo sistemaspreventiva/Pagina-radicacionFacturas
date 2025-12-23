@@ -28,15 +28,17 @@ export default function Instructivo() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* VIDEO */}
-          <div className="w-full aspect-video rounded-lg overflow-hidden border">
-            <iframe
-              className="w-full h-full"
-              src="/Video/Radicación de Facturas.mp4"
-              title="Video instructivo de radicación"
-              frameBorder="0"
-              allowFullScreen
-            />
-          </div>
+<div className="w-full aspect-video rounded-lg overflow-hidden border bg-black">
+  <video
+    className="w-full h-full"
+    src="/Video/Radicación de Facturas.mp4"
+    controls
+    preload="metadata"
+    controlsList="nodownload"
+  >
+    Tu navegador no soporta la reproducción de video.
+  </video>
+</div>
 
           {/* DOCUMENTOS GENERALES */}
           <div className="flex flex-col gap-3">
