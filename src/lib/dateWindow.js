@@ -32,7 +32,7 @@ export function getWindowForRole(role) {
 
   // 🔥 LÓGICA CORRECTA SEGÚN TU REGLA
   const openFrom = 1;
-  const openTo = 10; // TODOS los roles SOLO del 1 al 10
+  const openTo = 31; // TODOS los roles SOLO del 1 al 10
 
   const isOpenToday = day >= openFrom && day <= openTo;
 
