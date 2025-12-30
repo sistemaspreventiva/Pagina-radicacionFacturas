@@ -73,19 +73,19 @@ export default function Instructivo() {
         <Card
           titulo="Asistencial"
         
-          descripcion="Formatos y guías para personal asistencial. Radicación del 1 al 10 de cada mes."
+          descripcion="Formatos y guías para personal asistencial. Radicación habilitada del 1 al 10 de cada mes."
           items={Array.isArray(instructivos.asistencial) ? instructivos.asistencial : []}
           color="border-cyan-500"
         />
         <Card
           titulo="Administrativo"
-          descripcion="Formatos y guías para administrativo. Radicación del 1 al 10 de cada mes."
+          descripcion="Formatos y guías para personal administrativo. Radicación habilitada del 1 al 10 de cada mes."
           items={Array.isArray(instructivos.administrativo) ? instructivos.administrativo : []}
           color="border-blue-600"
         />
         <Card
           titulo="Transporte / Conductores"
-          descripcion="Formatos y guías para transporte. Habilitado todo el mes."
+          descripcion="Formatos y guías para personal de transporte. Radicación habilitada del 1 al 10 de cada mes."
           items={Array.isArray(instructivos.conductores) ? instructivos.conductores : []}
           color="border-orange-500"
         />
