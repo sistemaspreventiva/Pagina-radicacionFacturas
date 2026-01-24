@@ -24,7 +24,7 @@ export const instructivos = {
     },
     {
       titulo:
-        "IN-GH-002 INSTRUCTIVO CUENTA DE COBRO PERSONAL ASISTENCIAL v01 (PDF)",
+        "FO-GH-032 PLANTILLA CUENTA DE COBRO ASISTENCIAL v01",
       href:
         "/Asistencial/FO-GH-032 PLANTILLA CUENTA DE COBRO ASISTENCIAL v01.docx",
     },
