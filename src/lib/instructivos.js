@@ -1,46 +1,126 @@
 // src/lib/instructivos.js
-// Lista de instructivos y plantillas con rutas EXACTAS a /public
+// Catálogo único de documentos publicados en /public/documentos.
+//
+// Los archivos se guardan con nombre "slug" (sin tildes ni espacios) para que
+// la URL sea estable, pero se descargan con su NOMBRE OFICIAL gracias al
+// atributo download del enlace. Así el contratista recibe el archivo con el
+// código del sistema de gestión y la web no depende de caracteres especiales.
+//
+// Cada documento expone hasta dos formatos:
+//   - editable: el que se diligencia (DOCX / XLSX)
+//   - pdf:      versión de solo lectura, para consultar o imprimir
 
-export const instructivos = {
-  administrativo: [
+const BASE = "/documentos";
+
+/** Instructivos: guías del proceso. Se consultan, no se diligencian. */
+export const instructivos = [
+  {
+    id: "in-gf-001-radicacion",
+    codigo: "IN-GF-001",
+    titulo: "Instructivo para radicación de cuenta de cobro",
+    descripcion: "Guía general del proceso. Aplica a todos los roles.",
+    pdf: `${BASE}/instructivos/in-gf-001-radicacion-cuenta-cobro.pdf`,
+    editable: `${BASE}/instructivos/in-gf-001-radicacion-cuenta-cobro.docx`,
+    nombreOficial: "IN-GF-001 INSTRUCTIVO PARA RADICACIÓN CUENTA DE COBRO v01",
+  },
+  {
+    id: "in-gf-001-asistencial",
+    codigo: "IN-GF-001",
+    titulo: "Instructivo cuenta de cobro — personal asistencial",
+    descripcion: "Cómo diligenciar la cuenta de cobro del personal asistencial.",
+    pdf: `${BASE}/instructivos/in-gf-001-cuenta-cobro-asistencial.pdf`,
+    editable: `${BASE}/instructivos/in-gf-001-cuenta-cobro-asistencial.docx`,
+    nombreOficial: "IN-GF-001 INSTRUCTIVO CUENTA DE COBRO PERSONAL ASISTENCIAL v02",
+  },
+  {
+    id: "in-gf-002-seguridad-social",
+    codigo: "IN-GF-002",
+    titulo: "Instructivo cotización seguridad social independientes",
+    descripcion: "Cómo liquidar y soportar los aportes a seguridad social.",
+    pdf: `${BASE}/instructivos/in-gf-002-seguridad-social-independientes.pdf`,
+    editable: `${BASE}/instructivos/in-gf-002-seguridad-social-independientes.docx`,
+    nombreOficial: "IN-GF-002 INSTRUCTIVO COTIZACION SEGURIDAD SOCIAL INDEPENDIENTES v01",
+  },
+  {
+    id: "in-gf-003-conductores",
+    codigo: "IN-GF-003",
+    titulo: "Instructivo cuenta de cobro — conductores",
+    descripcion: "Cómo diligenciar el formato de cuenta de cobro de conductores.",
+    pdf: `${BASE}/instructivos/in-gf-003-cuenta-cobro-conductores.pdf`,
+    editable: `${BASE}/instructivos/in-gf-003-cuenta-cobro-conductores.docx`,
+    nombreOficial:
+      "IN-GF-003 INSTRUCTIVO PARA DILIGENCIAR EL FORMATO DE CUENTA DE COBRO CONDUCTORES V01",
+  },
+];
+
+/** Plantillas a diligenciar, agrupadas por rol. */
+export const plantillas = {
+  asistencial: [
     {
-      titulo: "FO-GH-025 INFORME DE EJECUCIÓN DE ACTIVIDADES CONTRACTUALES Docx",
-      href:
-        "/Administrativo/FO-GH-025 INFORME DE EJECUCIÓN DE ACTIVIDADES CONTRACTUALES v02.docx",
+      id: "fo-gf-005",
+      codigo: "FO-GF-005",
+      titulo: "Plantilla cuenta de cobro asistencial",
+      editable: `${BASE}/plantillas/fo-gf-005-cuenta-cobro-asistencial.docx`,
+      pdf: `${BASE}/plantillas/fo-gf-005-cuenta-cobro-asistencial.pdf`,
+      nombreOficial: "FO-GF-005 PLANTILLA CUENTA DE COBRO ASISTENCIAL v01",
     },
     {
-      titulo: "FO-GH-033 PLANTILLA CUENTA DE COBRO ADMINISTRATIVO Docx",
-      href:
-        "/Administrativo/FO-GH-033 PLANTILLA CUENTA DE COBRO ADMINISTRATIVO v01.docx",
+      id: "fo-gf-003",
+      codigo: "FO-GF-003",
+      titulo: "Plantilla relación de pacientes",
+      editable: `${BASE}/plantillas/fo-gf-003-relacion-pacientes.xlsx`,
+      pdf: `${BASE}/plantillas/fo-gf-003-relacion-pacientes.pdf`,
+      nombreOficial: "FO-GF-003 PLANTILLA RELACION DE PACIENTES v01",
     },
   ],
 
-  asistencial: [
+  administrativo: [
     {
-      titulo:
-        "FO-GH-030 PLANTILLA_RELACION_DE_PACIENTES_v02 (XLSX)",
-      href:
-        "/Asistencial/FO-GH-030 PLANTILLA_RELACION_DE_PACIENTES_v02.xlsx",
+      id: "fo-gf-006",
+      codigo: "FO-GF-006",
+      titulo: "Plantilla cuenta de cobro administrativo",
+      editable: `${BASE}/plantillas/fo-gf-006-cuenta-cobro-administrativo.docx`,
+      pdf: `${BASE}/plantillas/fo-gf-006-cuenta-cobro-administrativo.pdf`,
+      nombreOficial: "FO-GF-006 PLANTILLA CUENTA DE COBRO ADMINISTRATIVO v01",
     },
     {
-      titulo:
-        "FO-GH-032 PLANTILLA CUENTA DE COBRO ASISTENCIAL v01",
-      href:
-        "/Asistencial/FO-GH-032 PLANTILLA CUENTA DE COBRO ASISTENCIAL v01.docx",
+      id: "fo-gf-001",
+      codigo: "FO-GF-001",
+      titulo: "Informe de ejecución de actividades contractuales",
+      editable: `${BASE}/plantillas/fo-gf-001-informe-ejecucion-actividades.docx`,
+      pdf: `${BASE}/plantillas/fo-gf-001-informe-ejecucion-actividades.pdf`,
+      nombreOficial: "FO-GF-001 INFORME DE EJECUCIÓN DE ACTIVIDADES CONTRACTUALES v01",
     },
   ],
 
   conductores: [
     {
-      titulo:
-        "FO-GH-029 PLANTILLA CUENTA DE COBRO CONDUCTORES v02 (DOCX)",
-      href:
-        "/conductores/FO-GH-029 PLANTILLA CUENTA DE COBRO CONDUCTORES v02.docx",
+      id: "fo-gf-002",
+      codigo: "FO-GF-002",
+      titulo: "Plantilla cuenta de cobro conductores",
+      editable: `${BASE}/plantillas/fo-gf-002-cuenta-cobro-conductores.docx`,
+      pdf: `${BASE}/plantillas/fo-gf-002-cuenta-cobro-conductores.pdf`,
+      nombreOficial: "FO-GF-002 PLANTILLA CUENTA DE COBRO CONDUCTORES v01",
     },
     {
-      titulo: "FO-GH-031 RELACIÓN_DE_SERVICIOS-CONDUCTORES_v02 (xlsx)",
-      href:
-        "/conductores/FO-GH-031 RELACIÓN_DE_SERVICIOS-CONDUCTORES_v03.xlsx",
+      id: "fo-gf-004",
+      codigo: "FO-GF-004",
+      titulo: "Relación de servicios — conductores",
+      editable: `${BASE}/plantillas/fo-gf-004-relacion-servicios-conductores.xlsx`,
+      pdf: `${BASE}/plantillas/fo-gf-004-relacion-servicios-conductores.pdf`,
+      nombreOficial: "FO-GF-004 RELACIÓN_DE_SERVICIOS-CONDUCTORES_v01",
     },
   ],
 };
+
+/** Extensión de una ruta, en mayúsculas y sin punto: "DOCX", "XLSX", "PDF". */
+export function formatoDe(ruta) {
+  const m = /\.([a-z0-9]+)$/i.exec(ruta || "");
+  return m ? m[1].toUpperCase() : "";
+}
+
+/** Nombre con el que se descarga el archivo (código oficial + extensión). */
+export function nombreDescarga(doc, ruta) {
+  const ext = /\.([a-z0-9]+)$/i.exec(ruta || "");
+  return ext ? `${doc.nombreOficial}.${ext[1].toLowerCase()}` : doc.nombreOficial;
+}
