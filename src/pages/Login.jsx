@@ -41,7 +41,7 @@ export default function Login() {
               </p>
             )}
 
-            <div className="space-y-7">
+            <div className="space-y-7" data-guia="login-usuario">
               <div>
                 <label htmlFor="usuario" className="eyebrow block mb-1.5">
                   Usuario
@@ -103,7 +103,7 @@ export default function Login() {
             className="relative w-full max-w-xs mx-auto h-auto object-contain"
           />
 
-          <div className="relative text-center">
+          <div className="relative text-center" data-guia="login-ventana">
             <p className="eyebrow text-ps-blue">Ventana de radicación</p>
             <p className="mt-2 text-5xl font-semibold tracking-tight text-ps-navy">
               {OPEN_FROM} <span className="text-ps-teal">—</span> {OPEN_TO}
@@ -112,6 +112,7 @@ export default function Login() {
 
             <Link
               to="/instructivo"
+              data-guia="login-instructivos"
               className="mt-6 inline-flex items-center gap-2 border-b-2 border-ps-accent pb-1 text-sm font-semibold text-ps-navy hover:text-ps-blue transition-colors"
             >
               Ver instructivos y formatos

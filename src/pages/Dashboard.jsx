@@ -36,6 +36,7 @@ export default function Dashboard() {
 
       {/* ── Estado de la ventana ────────────────────────────────── */}
       <div
+        data-guia="dash-estado"
         className="cintillo my-8"
         style={
           abierta
@@ -85,7 +86,7 @@ function Calendario({ w, dias }) {
   const hoy = w.today.getDate();
 
   return (
-    <section className="card lg:w-72" style={{ "--barra": "var(--color-ps-teal)" }}>
+    <section data-guia="dash-calendario" className="card lg:w-72" style={{ "--barra": "var(--color-ps-teal)" }}>
       <p className="eyebrow">{w.tz}</p>
       <h2 className="mt-2 text-section font-semibold text-ps-navy">
         {etiquetaPeriodo(toPeriodo(w.today))}

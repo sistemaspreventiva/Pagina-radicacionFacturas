@@ -138,7 +138,7 @@ export default function UploadForm({ canUpload, user }) {
 
       <div className="space-y-8">
         {/* Periodo — define el mes del consecutivo */}
-        <div>
+        <div data-guia="dash-periodo">
           <label htmlFor="periodo" className="eyebrow block mb-1.5">
             Periodo que radica
           </label>
@@ -164,7 +164,7 @@ export default function UploadForm({ canUpload, user }) {
 
         {/* Consecutivo y valor */}
         <div className="grid sm:grid-cols-2 gap-8">
-          <div>
+          <div data-guia="dash-numero">
             <label htmlFor="numero" className="eyebrow block mb-1.5">
               N.º de cuenta de cobro
             </label>
@@ -179,7 +179,7 @@ export default function UploadForm({ canUpload, user }) {
             </p>
           </div>
 
-          <div>
+          <div data-guia="dash-valor">
             <label htmlFor="valor" className="eyebrow block mb-1.5">
               Valor
             </label>
@@ -196,7 +196,7 @@ export default function UploadForm({ canUpload, user }) {
         </div>
 
         {/* Archivos */}
-        <div>
+        <div data-guia="dash-archivos">
           <div className="flex items-baseline justify-between gap-4 mb-1.5">
             <span className="eyebrow">Archivos</span>
             {files.length > 0 && (
@@ -273,7 +273,7 @@ export default function UploadForm({ canUpload, user }) {
         </div>
       )}
 
-      <button type="submit" className="btn-primary mt-10 w-full" disabled={bloqueado}>
+      <button type="submit" data-guia="dash-enviar" className="btn-primary mt-10 w-full" disabled={bloqueado}>
         {sending
           ? "Enviando…"
           : canUpload

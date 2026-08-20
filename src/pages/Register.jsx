@@ -86,6 +86,7 @@ export default function Register() {
               autoComplete="email"
             />
             <Campo
+              guia="reg-cedula"
               id="dni"
               etiqueta="Cédula"
               value={dni}
@@ -101,7 +102,7 @@ export default function Register() {
               autoComplete="username"
             />
 
-            <div>
+            <div data-guia="reg-rol">
               <label htmlFor="rol" className="eyebrow block mb-1.5">
                 Rol
               </label>
@@ -159,9 +160,9 @@ export default function Register() {
   );
 }
 
-function Campo({ id, etiqueta, value, onChange, ayuda, type = "text", ...rest }) {
+function Campo({ id, etiqueta, value, onChange, ayuda, guia, type = "text", ...rest }) {
   return (
-    <div>
+    <div data-guia={guia}>
       <label htmlFor={id} className="eyebrow block mb-1.5">
         {etiqueta}
       </label>

@@ -200,3 +200,23 @@ a {
   background: var(--fondo, var(--color-ps-blue-50));
   padding: 1rem 1.25rem;
 }
+
+/* ── Guía: halo que llama la atención sin mover el botón ────────── */
+@keyframes ps-latido {
+  0%   { transform: scale(1);   opacity: 0.55; }
+  70%  { transform: scale(1.7); opacity: 0; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+.halo-guia::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: var(--color-ps-accent);
+  animation: ps-latido 2.4s ease-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .halo-guia::before { animation: none; }
+}

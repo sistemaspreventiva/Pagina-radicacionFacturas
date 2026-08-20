@@ -51,6 +51,7 @@ export default function Instructivo() {
               .card, porque .card fuerza background blanco y dejaba una
               banda clara alrededor del video. */}
           <div
+            data-guia="inst-video"
             className="flex items-center justify-center h-full min-h-[16rem] border border-ps-line"
             style={{
               background: "var(--color-ps-ink)",
@@ -68,7 +69,7 @@ export default function Instructivo() {
             </video>
           </div>
 
-          <ul className="card !py-2 h-full" style={{ "--barra": "var(--color-ps-blue)" }}>
+          <ul data-guia="inst-instructivos" className="card !py-2 h-full" style={{ "--barra": "var(--color-ps-blue)" }}>
             {instructivos.map((doc) => (
               <Documento key={doc.id} doc={doc} />
             ))}
@@ -84,7 +85,7 @@ export default function Instructivo() {
           descripcion="Descarga el archivo editable para diligenciarlo. El PDF es solo de consulta."
         />
 
-        <div className="mt-10 grid md:grid-cols-3 gap-x-10 gap-y-12">
+        <div data-guia="inst-roles" className="mt-10 grid md:grid-cols-3 gap-x-10 gap-y-12">
           {ROLES.map((rol) => (
             <div key={rol.clave} className="card !p-0" style={{ "--barra": rol.color }}>
               <h3
@@ -134,7 +135,7 @@ function Documento({ doc }) {
         <p className="mt-1 text-xs text-ps-muted">{doc.descripcion}</p>
       )}
 
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="mt-3 flex flex-wrap gap-2" data-guia="inst-formatos">
         {doc.editable && <Descarga doc={doc} ruta={doc.editable} principal />}
         {doc.pdf && <Descarga doc={doc} ruta={doc.pdf} />}
       </div>
