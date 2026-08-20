@@ -13,58 +13,114 @@ export default function Login() {
   const onSubmit = (e) => {
     e.preventDefault();
     setErr("");
-    if (!username || !pass) return setErr("Ingresa usuario y contraseña");
-    const ok = login(username, pass);
-    if (ok) nav("/dashboard"); else setErr("Credenciales inválidas");
+    if (!username || !pass) return setErr("Ingresa usuario y contraseña.");
+    if (login(username, pass)) nav("/dashboard");
+    else setErr("Usuario o contraseña incorrectos.");
   };
 
   return (
-    <main className="bg-slate-50">
-      <section className="max-w-6xl mx-auto px-4 py-10">
-        <div className="mb-6">
-          <h2 className="text-3xl font-bold text-[color:var(--ps-navy)]">
-            Bienvenido a{" "}
-            <span className="bg-gradient-to-r from-[var(--ps-cyan)] via-[var(--ps-blue)] to-[var(--ps-orange)] bg-clip-text text-transparent">
-              Radicación de Cuentas de Cobro
-            </span>
-          </h2>
-          <p className="text-[color:rgba(10,42,77,.7)]">Preventiva Salud IPS</p>
-        </div>
+    <main className="max-w-5xl mx-auto px-6">
+      <div className="grid md:grid-cols-[1fr_auto] gap-14 md:gap-16 items-start pt-16 md:pt-20 pb-4">
+        {/* ── Titular ─────────────────────────────────────────── */}
+        <div className="max-w-xl">
+          <p className="eyebrow">Preventiva Salud IPS</p>
 
-        <div className="grid md:grid-cols-2 gap-8 items-center">
-          <form onSubmit={onSubmit} className="bg-white p-6 rounded-2xl shadow border space-y-3">
-            <h1 className="text-lg font-semibold text-[color:var(--ps-navy)]">Iniciar sesión</h1>
-            {err && <p className="text-sm text-red-600">{err}</p>}
-            <div>
-              <label className="block text-sm mb-1">Usuario</label>
-              <input className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500/50"
-                     value={username} onChange={(e)=>setUsername(e.target.value)} autoFocus />
-            </div>
-            <div>
-              <label className="block text-sm mb-1">Contraseña</label>
-              <input type="password" className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500/50"
-                     value={pass} onChange={(e)=>setPass(e.target.value)} />
-            </div>
-            <button type="submit" className="w-full bg-sky-600 hover:bg-sky-700 text-white py-2 rounded-lg font-semibold">
-              Iniciar sesión
-            </button>
-            <p className="text-sm text-slate-600">
-              ¿No tienes cuenta? <Link className="text-[color:var(--ps-orange)] hover:underline" to="/register">Regístrate</Link>
-            </p>
-          </form>
+          <h1 className="mt-5 text-title md:text-display font-semibold text-ps-navy">
+            Radicación de
+            <br />
+            cuentas de cobro
+          </h1>
 
-          <div className="hidden md:block">
-            <div className="relative rounded-2xl overflow-hidden border aspect-[4/3]">
-              <img src="/logo-preventiva.png" alt="Preventiva Salud IPS" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-br from-[var(--ps-cyan)]/25 via-[var(--ps-blue)]/20 to-[var(--ps-orange)]/20 mix-blend-multiply" />
-              <div className="absolute inset-0 ring-1 ring-white/30"></div>
-            </div>
-            <p className="mt-3 text-sm text-slate-600">
-              Suba sus cuentas de cobro de forma segura del {OPEN_FROM} al {OPEN_TO} de cada mes.
+          <div className="mt-8 flex items-baseline gap-3 border-t border-ps-line pt-5">
+            <span className="tick translate-y-0.5" aria-hidden="true" />
+            <p className="text-ps-muted">
+              Radica del{" "}
+              <span className="text-ps-ink font-medium">
+                {OPEN_FROM} al {OPEN_TO}
+              </span>{" "}
+              de cada mes.{" "}
+              <Link
+                to="/instructivo"
+                className="text-ps-blue hover:text-ps-navy font-medium underline underline-offset-4 decoration-ps-blue/40 hover:decoration-current transition-colors"
+              >
+                Ver instructivos
+              </Link>
             </p>
           </div>
+
+          {/* Formulario */}
+          <form onSubmit={onSubmit} className="mt-12 max-w-sm">
+            {err && (
+              <p
+                role="alert"
+                className="mb-6 border-l-2 border-ps-warn pl-3 text-sm text-ps-warn"
+              >
+                {err}
+              </p>
+            )}
+
+            <div className="space-y-7">
+              <div>
+                <label
+                  htmlFor="usuario"
+                  className="eyebrow block mb-1.5"
+                >
+                  Usuario
+                </label>
+                <input
+                  id="usuario"
+                  className="field"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  autoComplete="username"
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="clave"
+                  className="eyebrow block mb-1.5"
+                >
+                  Contraseña
+                </label>
+                <input
+                  id="clave"
+                  type="password"
+                  className="field"
+                  value={pass}
+                  onChange={(e) => setPass(e.target.value)}
+                  autoComplete="current-password"
+                />
+              </div>
+            </div>
+
+            <button type="submit" className="btn-primary mt-10 w-full sm:w-auto">
+              Iniciar sesión
+              <span aria-hidden="true">→</span>
+            </button>
+
+            <p className="mt-8 text-sm text-ps-muted">
+              ¿No tienes cuenta?{" "}
+              <Link
+                to="/register"
+                className="text-ps-ink font-medium underline underline-offset-4 decoration-ps-line hover:decoration-ps-accent transition-colors"
+              >
+                Regístrate
+              </Link>
+            </p>
+          </form>
         </div>
-      </section>
+
+        {/* ── Logo ────────────────────────────────────────────── */}
+        <div className="hidden md:block w-64 pt-3">
+          <img
+            src="/logo-preventiva-marca.png"
+            alt="Preventiva Salud IPS"
+            className="w-full h-auto object-contain"
+          />
+        </div>
+      </div>
     </main>
   );
 }

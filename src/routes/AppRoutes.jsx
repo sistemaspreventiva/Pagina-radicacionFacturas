@@ -12,7 +12,7 @@ function ProtectedRoute() {
   // token todavía es null. Sin esta espera, refrescar /dashboard expulsa al login.
   if (!ready) {
     return (
-      <main className="max-w-6xl mx-auto px-4 py-10 text-slate-500">
+      <main className="max-w-5xl mx-auto px-6 pt-24 text-sm text-ps-muted">
         Cargando…
       </main>
     );

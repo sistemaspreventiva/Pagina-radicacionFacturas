@@ -1,118 +1,135 @@
 import { useAuth } from "../context/AuthContext.jsx";
-import { getWindow } from "../lib/dateWindow.js";
+import { getWindow, etiquetaPeriodo, toPeriodo } from "../lib/dateWindow.js";
 import UploadForm from "../components/UploadForm.jsx";
 
-const week = ["D", "L", "M", "X", "J", "V", "S"];
+const SEMANA = ["L", "M", "X", "J", "V", "S", "D"];
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
-  const role = user?.role || "asistencial";
   const w = getWindow();
+  const abierta = w.isOpenToday;
 
-  // 🔹 CAMBIO ÚNICO: capitalizar solo la primera letra del mes
-  const rawMonthName = w.today.toLocaleDateString("es-CO", {
-    month: "long",
-    year: "numeric",
-  });
-  const monthName =
-    rawMonthName.charAt(0).toUpperCase() + rawMonthName.slice(1);
-
-  const firstDow = new Date(w.year, w.month, 1).getDay(); // 0=Dom
-  const days = [];
-  for (let i = 0; i < firstDow; i++) days.push(null);
-  for (let d = 1; d <= w.lastDate; d++) days.push(d);
-
-  const canUploadToday = w.isOpenToday;
+  // Rejilla que empieza en lunes: getDay() da 0=domingo.
+  const primerDia = new Date(w.year, w.month, 1).getDay();
+  const huecos = (primerDia + 6) % 7;
+  const dias = [
+    ...Array.from({ length: huecos }, () => null),
+    ...Array.from({ length: w.lastDate }, (_, i) => i + 1),
+  ];
 
   return (
-    <main className="max-w-6xl mx-auto px-4 py-8">
-      <div className="flex items-start justify-between gap-4">
+    <main className="max-w-5xl mx-auto px-6 pt-16 md:pt-20 pb-8">
+      {/* ── Encabezado ──────────────────────────────────────────── */}
+      <div className="flex items-start justify-between gap-6 pb-8 border-b border-ps-line">
         <div>
-          <h2 className="text-2xl font-bold text-[color:var(--ps-navy)]">
-            Hola {user?.name || user?.username}
-          </h2>
-          <p className="text-slate-600">
-            Rol: <span className="font-medium capitalize">{role}</span>
-          </p>
+          <p className="eyebrow">{user?.role}</p>
+          <h1 className="mt-3 text-title font-semibold text-ps-navy">
+            {user?.name || user?.username}
+          </h1>
         </div>
-        <button
-          onClick={logout}
-          className="rounded-lg border px-3 py-2 hover:bg-slate-100"
-        >
+        <button onClick={logout} className="btn-ghost shrink-0">
           Cerrar sesión
         </button>
       </div>
 
-      <div className="mt-4 p-3 rounded-xl border bg-white">
-        <p className="text-slate-700">
-          La radicación está{" "}
-          <b>
-            habilitada del {w.openFrom} al {w.openTo} de cada mes
-          </b>{" "}
-          para todos los roles.
-        </p>
-        <p
-          className={`mt-1 text-sm ${
-            canUploadToday ? "text-green-700" : "text-red-600"
-          }`}
-        >
-          Hoy: {canUploadToday ? "Ventana abierta ✅" : "Ventana cerrada ❌"}
+      {/* ── Estado de la ventana ────────────────────────────────── */}
+      <div className="py-8 border-b border-ps-line">
+        <div className="flex items-baseline gap-3">
+          <span
+            className={`inline-block w-1.5 h-1.5 rounded-full translate-y-[-2px] ${
+              abierta ? "bg-ps-teal" : "bg-ps-warn"
+            }`}
+            aria-hidden="true"
+          />
+          <p className="text-section font-medium text-ps-ink">
+            {abierta ? "Ventana abierta" : "Ventana cerrada"}
+          </p>
+        </div>
+        <p className="mt-2 text-ps-muted pl-[18px]">
+          La radicación está habilitada{" "}
+          <span className="text-ps-ink font-medium">
+            del {w.openFrom} al {w.openTo}
+          </span>{" "}
+          de cada mes, para todos los roles.
         </p>
       </div>
 
-      <div className="mt-6 grid md:grid-cols-2 gap-6">
-        {/* Calendario */}
-        <div className="p-4 rounded-2xl border bg-white">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-[color:var(--ps-navy)]">
-              {monthName}
-            </h3>
-            <span className="text-xs text-slate-500">{w.tz}</span>
-          </div>
+      {/* ── Calendario + formulario ─────────────────────────────── */}
+      <div className="grid lg:grid-cols-[auto_1fr] gap-12 lg:gap-16 pt-10">
+        <Calendario w={w} dias={dias} />
 
-          <div className="grid grid-cols-7 text-center text-xs font-medium text-slate-500 mb-2">
-            {week.map((d) => (
-              <div key={d} className="py-1">
-                {d}
-              </div>
-            ))}
+        <div>
+          <p className="eyebrow">Radicar</p>
+          <h2 className="mt-3 text-section font-medium text-ps-ink">
+            Cuenta de cobro
+          </h2>
+          <div className="mt-8">
+            <UploadForm canUpload={abierta} user={user} />
           </div>
-
-          <div className="grid grid-cols-7 gap-1">
-            {days.map((d, idx) => {
-              if (d === null) return <div key={`x-${idx}`} />;
-              const enabled = w.isDayEnabled(d);
-              const isToday = d === w.today.getDate();
-              const base = "py-2 rounded-lg border text-sm";
-              const ok =
-                "bg-green-50 border-green-200 text-green-700";
-              const ko =
-                "bg-slate-50 border-slate-200 text-slate-400";
-              return (
-                <div
-                  key={d}
-                  className={`${base} ${enabled ? ok : ko} ${
-                    isToday ? "ring-2 ring-[var(--ps-blue)]" : ""
-                  }`}
-                >
-                  {d}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Formulario de radicación */}
-        <div className="p-4 rounded-2xl border bg-white">
-          <h3 className="font-semibold text-[color:var(--ps-navy)]">
-            Radicar cuenta de cobro
-          </h3>
-          <p className="text-xs text-slate-500 mb-3">
-            Destino: contabilidad@preventivaips.com.co
-          </p>
-          <UploadForm canUpload={canUploadToday} user={user} />
         </div>
       </div>
     </main>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Calendario: sin cajas ni bordes. El día habilitado se distingue
+   por peso tipográfico; hoy, por el punto naranja.
+   ══════════════════════════════════════════════════════════════════ */
+function Calendario({ w, dias }) {
+  const hoy = w.today.getDate();
+
+  return (
+    <section className="lg:w-72">
+      <p className="eyebrow">{w.tz}</p>
+      <h2 className="mt-3 text-section font-medium text-ps-ink">
+        {etiquetaPeriodo(toPeriodo(w.today))}
+      </h2>
+
+      <div className="mt-6 grid grid-cols-7 gap-y-1 text-center">
+        {SEMANA.map((d) => (
+          <div key={d} className="pb-3 text-[11px] font-medium text-ps-muted">
+            {d}
+          </div>
+        ))}
+
+        {dias.map((d, i) => {
+          if (d === null) return <div key={`h-${i}`} />;
+          const habilitado = w.isDayEnabled(d);
+          const esHoy = d === hoy;
+
+          return (
+            <div key={d} className="relative py-1.5">
+              <span
+                className={
+                  habilitado
+                    ? "text-sm font-semibold text-ps-navy"
+                    : "text-sm text-ps-line"
+                }
+              >
+                {d}
+              </span>
+              {esHoy && (
+                <span
+                  className="absolute left-1/2 -translate-x-1/2 bottom-0 w-1 h-1 rounded-full bg-ps-accent"
+                  aria-hidden="true"
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="mt-6 pt-4 border-t border-ps-line flex flex-col gap-2 text-xs text-ps-muted">
+        <span className="flex items-center gap-2">
+          <span className="font-semibold text-ps-navy">1</span>
+          Días habilitados
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="w-1 h-1 rounded-full bg-ps-accent" />
+          Hoy
+        </span>
+      </div>
+    </section>
   );
 }

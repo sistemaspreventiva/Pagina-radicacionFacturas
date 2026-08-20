@@ -2,11 +2,17 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth, ROLES } from "../context/AuthContext.jsx";
 
+const ETIQUETA_ROL = {
+  asistencial: "Asistencial",
+  conductor: "Transporte / Conductor",
+  administrativo: "Administrativo",
+};
+
 export default function Register() {
   const { register } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [dni, setDni] = useState("");              // ← nuevo
+  const [dni, setDni] = useState("");
   const [username, setUsername] = useState("");
   const [pass, setPass] = useState("");
   const [pass2, setPass2] = useState("");
@@ -17,78 +23,157 @@ export default function Register() {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    setErr(""); setOk("");
-    if (!name || !email || !dni || !username || !pass) return setErr("Completa todos los campos");
-    if (!/^\d{5,12}$/.test(dni)) return setErr("Cédula/DNI: 5-12 dígitos");
-    if (pass !== pass2) return setErr("Las contraseñas no coinciden");
+    setErr("");
+    setOk("");
+    if (!name || !email || !dni || !username || !pass)
+      return setErr("Completa todos los campos.");
+    if (!/^\d{5,12}$/.test(dni)) return setErr("La cédula debe tener entre 5 y 12 dígitos.");
+    if (pass.length < 6) return setErr("La contraseña debe tener al menos 6 caracteres.");
+    if (pass !== pass2) return setErr("Las contraseñas no coinciden.");
+
     try {
       register({ name, email, username, password: pass, role, dni });
-      setOk("Registro exitoso. Ahora puedes iniciar sesión.");
-      setTimeout(() => nav("/"), 800);
+      setOk("Cuenta creada. Te llevamos al inicio de sesión…");
+      setTimeout(() => nav("/"), 900);
     } catch (ex) {
-      setErr(ex.message || "No se pudo registrar");
+      setErr(ex.message || "No se pudo crear la cuenta.");
     }
   };
 
   return (
-    <main className="min-h-[calc(100vh-48px)] grid place-items-center bg-slate-50">
-      <form onSubmit={onSubmit} className="bg-white p-6 rounded-2xl shadow border w-[28rem] space-y-3">
-        <h1 className="text-xl font-bold text-[color:var(--ps-navy)]">Crear cuenta</h1>
-        {err && <p className="text-sm text-red-600">{err}</p>}
-        {ok && <p className="text-sm text-green-700">{ok}</p>}
-
-        <div className="grid grid-cols-1 gap-3">
-          <div>
-            <label className="block text-sm mb-1">Nombre completo</label>
-            <input className="w-full border rounded px-3 py-2" value={name} onChange={(e)=>setName(e.target.value)} />
-          </div>
-          <div>
-            <label className="block text-sm mb-1">Email</label>
-            <input type="email" className="w-full border rounded px-3 py-2" value={email} onChange={(e)=>setEmail(e.target.value)} />
-          </div>
-
-          {/* DNI/Cédula */}
-          <div>
-            <label className="block text-sm mb-1">Cédula / DNI</label>
-            <input
-              className="w-full border rounded px-3 py-2"
-              value={dni}
-              onChange={(e)=>setDni(e.target.value.replace(/\D/g,""))}
-              placeholder="Solo números"
-            />
-            <p className="text-xs text-slate-500 mt-1">
-              Se usará para generar el consecutivo automático (DSMMYY-CC).
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm mb-1">Usuario</label>
-            <input className="w-full border rounded px-3 py-2" value={username} onChange={(e)=>setUsername(e.target.value)} />
-          </div>
-          <div>
-            <label className="block text-sm mb-1">Rol</label>
-            <select className="w-full border rounded px-3 py-2 bg-white" value={role} onChange={(e)=>setRole(e.target.value)}>
-              {ROLES.map(r => <option key={r} value={r}>{r[0].toUpperCase()+r.slice(1)}</option>)}
-            </select>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm mb-1">Contraseña</label>
-              <input type="password" className="w-full border rounded px-3 py-2" value={pass} onChange={(e)=>setPass(e.target.value)} />
-            </div>
-            <div>
-              <label className="block text-sm mb-1">Repetir contraseña</label>
-              <input type="password" className="w-full border rounded px-3 py-2" value={pass2} onChange={(e)=>setPass2(e.target.value)} />
-            </div>
-          </div>
-        </div>
-
-        <button className="w-full bg-sky-600 hover:bg-sky-700 text-white py-2 rounded-lg">Registrarme</button>
-        <p className="text-sm text-slate-600">
-          ¿Ya tienes cuenta? <Link className="text-[color:var(--ps-orange)] hover:underline" to="/">Inicia sesión</Link>
+    <main className="max-w-5xl mx-auto px-6">
+      <div className="max-w-lg pt-16 md:pt-24 pb-8">
+        <p className="eyebrow">Preventiva Salud IPS</p>
+        <h1 className="mt-5 text-title font-semibold text-ps-navy">
+          Crear cuenta
+        </h1>
+        <p className="mt-4 text-ps-muted border-t border-ps-line pt-5">
+          Tu cédula se usa para generar el consecutivo de la cuenta de cobro.
         </p>
-      </form>
+
+        <form onSubmit={onSubmit} className="mt-12">
+          {err && (
+            <p
+              role="alert"
+              className="mb-6 border-l-2 border-ps-warn pl-3 text-sm text-ps-warn"
+            >
+              {err}
+            </p>
+          )}
+          {ok && (
+            <p
+              role="status"
+              className="mb-6 border-l-2 border-ps-ok pl-3 text-sm text-ps-ok"
+            >
+              {ok}
+            </p>
+          )}
+
+          <div className="space-y-7">
+            <Campo
+              id="nombre"
+              etiqueta="Nombre completo"
+              value={name}
+              onChange={setName}
+              autoComplete="name"
+            />
+            <Campo
+              id="email"
+              etiqueta="Correo electrónico"
+              type="email"
+              value={email}
+              onChange={setEmail}
+              autoComplete="email"
+            />
+            <Campo
+              id="dni"
+              etiqueta="Cédula"
+              value={dni}
+              onChange={(v) => setDni(v.replace(/\D/g, ""))}
+              inputMode="numeric"
+              ayuda="Solo números, sin puntos ni espacios."
+            />
+            <Campo
+              id="usuario"
+              etiqueta="Usuario"
+              value={username}
+              onChange={setUsername}
+              autoComplete="username"
+            />
+
+            <div>
+              <label htmlFor="rol" className="eyebrow block mb-1.5">
+                Rol
+              </label>
+              <select
+                id="rol"
+                className="field cursor-pointer"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+              >
+                {ROLES.map((r) => (
+                  <option key={r} value={r}>
+                    {ETIQUETA_ROL[r] || r}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-7">
+              <Campo
+                id="pass"
+                etiqueta="Contraseña"
+                type="password"
+                value={pass}
+                onChange={setPass}
+                autoComplete="new-password"
+              />
+              <Campo
+                id="pass2"
+                etiqueta="Repetir contraseña"
+                type="password"
+                value={pass2}
+                onChange={setPass2}
+                autoComplete="new-password"
+              />
+            </div>
+          </div>
+
+          <button type="submit" className="btn-primary mt-10 w-full sm:w-auto">
+            Crear cuenta
+            <span aria-hidden="true">→</span>
+          </button>
+
+          <p className="mt-8 text-sm text-ps-muted">
+            ¿Ya tienes cuenta?{" "}
+            <Link
+              to="/"
+              className="text-ps-ink font-medium underline underline-offset-4 decoration-ps-line hover:decoration-ps-accent transition-colors"
+            >
+              Inicia sesión
+            </Link>
+          </p>
+        </form>
+      </div>
     </main>
+  );
+}
+
+function Campo({ id, etiqueta, value, onChange, ayuda, type = "text", ...rest }) {
+  return (
+    <div>
+      <label htmlFor={id} className="eyebrow block mb-1.5">
+        {etiqueta}
+      </label>
+      <input
+        id={id}
+        type={type}
+        className="field"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        {...rest}
+      />
+      {ayuda && <p className="mt-1.5 text-xs text-ps-muted">{ayuda}</p>}
+    </div>
   );
 }

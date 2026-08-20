@@ -2,16 +2,20 @@ import { OPEN_FROM, OPEN_TO } from "../lib/dateWindow.js";
 
 export default function Footer() {
   const year = new Date().getFullYear();
+
   return (
-    <footer className="mt-10">
-      <div className="h-1 bg-gradient-to-r from-[var(--ps-orange)] via-[var(--ps-cyan)] to-[var(--ps-blue)]" />
-      <div className="bg-gradient-to-r from-[var(--ps-navy)] to-[var(--ps-blue)] text-white">
-        <div className="max-w-6xl mx-auto px-4 py-6 text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p>© {year} Preventiva Salud IPS</p>
-          <p className="text-white/80">
-            Radicación habilitada del {OPEN_FROM} al {OPEN_TO} de cada mes
-          </p>
-        </div>
+    <footer className="mt-24 border-t border-ps-line">
+      <div className="max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row sm:items-baseline justify-between gap-3">
+        <p className="text-sm text-ps-muted">
+          © {year} Preventiva Salud IPS
+        </p>
+        <p className="text-sm text-ps-muted">
+          Radicación habilitada{" "}
+          <span className="text-ps-ink font-medium">
+            del {OPEN_FROM} al {OPEN_TO}
+          </span>{" "}
+          de cada mes
+        </p>
       </div>
     </footer>
   );

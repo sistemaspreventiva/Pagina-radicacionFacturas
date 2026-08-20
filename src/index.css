@@ -1,14 +1,171 @@
 @import "tailwindcss";
 
-/* Colores de marca */
-:root{
-  --ps-navy:#0a2a4d;
-  --ps-blue:#0f5cc0;
-  --ps-cyan:#13c2be;
-  --ps-orange:#ff8a00;
+/* ══════════════════════════════════════════════════════════════════
+   SISTEMA DE DISEÑO — Preventiva Salud IPS
+   Los colores son los muestreados del logo, no aproximaciones.
+   Declarados en @theme para que Tailwind v4 genere las utilidades
+   (bg-ps-navy, text-ps-accent, border-ps-line, …).
+   ══════════════════════════════════════════════════════════════════ */
+@theme {
+  /* Marca */
+  --color-ps-navy: #002460; /* azul profundo del logo */
+  --color-ps-blue: #00489c; /* azul principal */
+  --color-ps-teal: #009cb4; /* turquesa */
+  --color-ps-accent: #f0840c; /* naranja: SOLO la acción principal */
+
+  /* Neutros */
+  --color-ps-ink: #0b1420; /* texto principal */
+  --color-ps-muted: #5b6673; /* texto secundario */
+  --color-ps-line: #e6e8ec; /* filetes de 1px */
+  --color-ps-wash: #f7f8fa; /* fondo sutil */
+
+  /* Estados */
+  --color-ps-ok: #0f7a5f;
+  --color-ps-warn: #b23c17;
+
+  /* Escala tipográfica editorial: títulos grandes y compactos */
+  --text-display: 3.5rem;
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.035em;
+
+  --text-title: 2rem;
+  --text-title--line-height: 1.12;
+  --text-title--letter-spacing: -0.025em;
+
+  --text-section: 1.125rem;
+  --text-section--line-height: 1.3;
+  --text-section--letter-spacing: -0.01em;
 }
 
-a { text-decoration: none; color: inherit; }
+/* ── Base ───────────────────────────────────────────────────────── */
+html {
+  -webkit-text-size-adjust: 100%;
+}
 
-/* Seguridad: que se vea algo aunque Tailwind falle */
-body { background: #f8fafc; }
+body {
+  background: #fff;
+  color: var(--color-ps-ink);
+  font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Un solo estilo de foco en toda la app, siempre visible */
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--color-ps-blue);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ── Utilidades propias ─────────────────────────────────────────── */
+
+/* Etiqueta de sección: versalita fina sobre un filete */
+.eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ps-muted);
+}
+
+/* Campo de texto: sin caja, solo una línea inferior que se activa */
+.field {
+  width: 100%;
+  padding: 0.625rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--color-ps-line);
+  background: transparent;
+  font-size: 1rem;
+  color: var(--color-ps-ink);
+  transition: border-color 0.15s ease;
+}
+.field::placeholder {
+  color: #aab2bd;
+}
+.field:hover:not(:disabled) {
+  border-bottom-color: #c6ccd4;
+}
+.field:focus {
+  outline: none;
+  border-bottom-color: var(--color-ps-blue);
+  border-bottom-width: 2px;
+  padding-bottom: calc(0.625rem - 1px);
+}
+.field:disabled {
+  color: #9aa3ae;
+  cursor: not-allowed;
+}
+
+/* Acción principal. Una por pantalla, y es la única naranja. */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8125rem 1.5rem;
+  background: var(--color-ps-accent);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  letter-spacing: -0.01em;
+  border: 0;
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.07);
+}
+.btn-primary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.btn-primary:disabled {
+  background: var(--color-ps-line);
+  color: #9aa3ae;
+  cursor: not-allowed;
+}
+
+/* Acción secundaria: solo contorno */
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-ps-line);
+  background: transparent;
+  color: var(--color-ps-ink);
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.btn-ghost:hover:not(:disabled) {
+  border-color: var(--color-ps-ink);
+  background: var(--color-ps-wash);
+}
+
+/* El check del logo, como motivo gráfico */
+.tick {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  flex: none;
+  background: var(--color-ps-accent);
+  -webkit-mask: var(--tick-mask) center / contain no-repeat;
+  mask: var(--tick-mask) center / contain no-repeat;
+  --tick-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M2 13.5 8.5 20 22 3.5l-2.2-1.5L8.2 15.4 3.8 11z'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

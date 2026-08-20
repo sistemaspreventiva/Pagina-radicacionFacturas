@@ -7,54 +7,44 @@ import {
 } from "../lib/instructivos.js";
 import { OPEN_FROM, OPEN_TO } from "../lib/dateWindow.js";
 
-const VENTANA = `Radicación habilitada del ${OPEN_FROM} al ${OPEN_TO} de cada mes.`;
-
 const ROLES = [
-  {
-    clave: "asistencial",
-    titulo: "Asistencial",
-    descripcion: "Formatos para personal asistencial.",
-    color: "border-cyan-500",
-  },
-  {
-    clave: "administrativo",
-    titulo: "Administrativo",
-    descripcion: "Formatos para personal administrativo.",
-    color: "border-blue-600",
-  },
-  {
-    clave: "conductores",
-    titulo: "Transporte / Conductores",
-    descripcion: "Formatos para personal de transporte.",
-    color: "border-orange-500",
-  },
+  { clave: "asistencial", titulo: "Asistencial" },
+  { clave: "administrativo", titulo: "Administrativo" },
+  { clave: "conductores", titulo: "Transporte" },
 ];
 
 export default function Instructivo() {
   return (
-    <main className="max-w-6xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold text-[color:var(--ps-navy)] mb-2">
-        Instructivos de radicación de cuentas de cobro
-      </h1>
-      <p className="text-slate-600 mb-2">
-        Descarga los formatos y guías necesarios según tu rol.
-      </p>
-      <p className="text-sm font-medium text-[color:var(--ps-blue)] mb-8">
-        {VENTANA}
-      </p>
+    <main className="max-w-5xl mx-auto px-6 pt-16 md:pt-24 pb-8">
+      {/* ── Titular ─────────────────────────────────────────────── */}
+      <div className="max-w-2xl">
+        <p className="eyebrow">Documentos</p>
+        <h1 className="mt-5 text-title md:text-display font-semibold text-ps-navy">
+          Instructivos
+          <br />y formatos
+        </h1>
+        <div className="mt-8 flex items-baseline gap-3 border-t border-ps-line pt-5">
+          <span className="tick translate-y-0.5" aria-hidden="true" />
+          <p className="text-ps-muted">
+            Radicación habilitada{" "}
+            <span className="text-ps-ink font-medium">
+              del {OPEN_FROM} al {OPEN_TO}
+            </span>{" "}
+            de cada mes.
+          </p>
+        </div>
+      </div>
 
-      {/* ── Guía general: video + instructivos ─────────────────────── */}
-      <section className="mb-14 bg-white rounded-2xl border p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-[color:var(--ps-navy)] mb-2">
-          Guía general del proceso de radicación
-        </h2>
-        <p className="text-sm text-slate-600 mb-6">
-          Revisa el video para entender el proceso completo y consulta los
-          instructivos de apoyo.
-        </p>
+      {/* ── Guía general ────────────────────────────────────────── */}
+      <section className="mt-20">
+        <Encabezado
+          numero="01"
+          titulo="Guía del proceso"
+          descripcion="Mira el video para entender la radicación de principio a fin, y consulta los instructivos de apoyo."
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="w-full aspect-video rounded-lg overflow-hidden border bg-black">
+        <div className="mt-10 grid lg:grid-cols-2 gap-12">
+          <div className="w-full aspect-video bg-ps-ink">
             <video
               className="w-full h-full"
               src={encodeURI("/Video/Radicación de Facturas.mp4")}
@@ -66,107 +56,94 @@ export default function Instructivo() {
             </video>
           </div>
 
-          <ul className="flex flex-col gap-3">
+          <ul className="border-t border-ps-line">
             {instructivos.map((doc) => (
-              <li key={doc.id}>
-                <Documento doc={doc} />
-              </li>
+              <Documento key={doc.id} doc={doc} />
             ))}
           </ul>
         </div>
       </section>
 
-      {/* ── Plantillas por rol ─────────────────────────────────────── */}
-      <h2 className="text-2xl font-semibold text-[color:var(--ps-navy)] mb-2">
-        Formatos según tipo de usuario
-      </h2>
-      <p className="text-sm text-slate-600 mb-6">
-        Descarga el archivo editable para diligenciarlo. El PDF es solo de
-        consulta.
-      </p>
+      {/* ── Plantillas por rol ──────────────────────────────────── */}
+      <section className="mt-24">
+        <Encabezado
+          numero="02"
+          titulo="Formatos por rol"
+          descripcion="Descarga el archivo editable para diligenciarlo. El PDF es solo de consulta."
+        />
 
-      <section className="grid md:grid-cols-3 gap-6">
-        {ROLES.map((rol) => (
-          <Card
-            key={rol.clave}
-            titulo={rol.titulo}
-            descripcion={`${rol.descripcion} ${VENTANA}`}
-            items={plantillas[rol.clave] || []}
-            color={rol.color}
-          />
-        ))}
+        <div className="mt-10 grid md:grid-cols-3 gap-x-10 gap-y-12">
+          {ROLES.map((rol) => (
+            <div key={rol.clave}>
+              <h3 className="pb-3 text-section font-medium text-ps-navy border-b-2 border-ps-navy">
+                {rol.titulo}
+              </h3>
+              <ul>
+                {(plantillas[rol.clave] || []).map((doc) => (
+                  <Documento key={doc.id} doc={doc} />
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       </section>
     </main>
   );
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   Un documento con sus formatos disponibles
-   ══════════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════════ */
+
+function Encabezado({ numero, titulo, descripcion }) {
+  return (
+    <div className="flex gap-6 md:gap-10 border-t border-ps-line pt-6">
+      <span className="eyebrow shrink-0 pt-1">{numero}</span>
+      <div className="max-w-xl">
+        <h2 className="text-title font-semibold text-ps-navy">{titulo}</h2>
+        <p className="mt-3 text-ps-muted">{descripcion}</p>
+      </div>
+    </div>
+  );
+}
+
 function Documento({ doc }) {
   return (
-    <div className="rounded-lg border px-4 py-3 hover:bg-slate-50 transition-colors">
-      <p className="font-medium text-sm text-[color:var(--ps-navy)]">
-        <span className="text-slate-400 mr-1">{doc.codigo}</span>
+    <li className="py-4 border-b border-ps-line">
+      <p className="text-sm text-ps-ink leading-snug">
+        <span className="eyebrow mr-2">{doc.codigo}</span>
         {doc.titulo}
       </p>
 
       {doc.descripcion && (
-        <p className="text-xs text-slate-500 mt-0.5">{doc.descripcion}</p>
+        <p className="mt-1 text-xs text-ps-muted">{doc.descripcion}</p>
       )}
 
-      <div className="flex flex-wrap gap-2 mt-2">
+      <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1">
         {doc.editable && <Descarga doc={doc} ruta={doc.editable} principal />}
         {doc.pdf && <Descarga doc={doc} ruta={doc.pdf} />}
       </div>
-    </div>
+    </li>
   );
 }
 
 /* Enlace de descarga. Conserva el nombre oficial del documento. */
 function Descarga({ doc, ruta, principal = false }) {
   const formato = formatoDe(ruta);
-  const estilo = principal
-    ? "bg-[var(--ps-blue)] text-white hover:brightness-110"
-    : "border text-[color:var(--ps-navy)] hover:bg-slate-100";
 
   return (
     <a
       href={ruta}
       download={nombreDescarga(doc, ruta)}
-      className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition ${estilo}`}
       title={`Descargar ${doc.nombreOficial}.${formato.toLowerCase()}`}
+      className={`group inline-flex items-baseline gap-1.5 text-xs font-medium transition-colors ${
+        principal
+          ? "text-ps-blue hover:text-ps-navy"
+          : "text-ps-muted hover:text-ps-ink"
+      }`}
     >
-      {formato}
-      <span className="opacity-70">↓</span>
+      <span className="underline underline-offset-4 decoration-ps-line group-hover:decoration-current">
+        {formato}
+      </span>
+      <span aria-hidden="true">↓</span>
     </a>
-  );
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   Tarjeta de plantillas por rol
-   ══════════════════════════════════════════════════════════════════ */
-function Card({ titulo, descripcion, items, color }) {
-  return (
-    <div className={`rounded-2xl border ${color} p-5 bg-white shadow-sm`}>
-      <h3 className="text-xl font-semibold text-[color:var(--ps-navy)] mb-1">
-        {titulo}
-      </h3>
-      <p className="text-sm text-slate-600 mb-4">{descripcion}</p>
-
-      {items.length > 0 ? (
-        <ul className="space-y-3">
-          {items.map((doc) => (
-            <li key={doc.id}>
-              <Documento doc={doc} />
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-sm text-slate-400 italic">
-          No hay documentos disponibles.
-        </p>
-      )}
-    </div>
   );
 }
