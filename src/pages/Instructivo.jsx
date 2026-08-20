@@ -8,9 +8,9 @@ import {
 import { OPEN_FROM, OPEN_TO } from "../lib/dateWindow.js";
 
 const ROLES = [
-  { clave: "asistencial", titulo: "Asistencial" },
-  { clave: "administrativo", titulo: "Administrativo" },
-  { clave: "conductores", titulo: "Transporte" },
+  { clave: "asistencial", titulo: "Asistencial", color: "var(--color-ps-teal)" },
+  { clave: "administrativo", titulo: "Administrativo", color: "var(--color-ps-blue)" },
+  { clave: "conductores", titulo: "Transporte", color: "var(--color-ps-accent)" },
 ];
 
 export default function Instructivo() {
@@ -23,7 +23,10 @@ export default function Instructivo() {
           Instructivos
           <br />y formatos
         </h1>
-        <div className="mt-8 flex items-baseline gap-3 border-t border-ps-line pt-5">
+        <div
+          className="cintillo mt-8 flex items-baseline gap-3"
+          style={{ "--borde": "var(--color-ps-teal)", "--fondo": "var(--color-ps-teal-50)" }}
+        >
           <span className="tick translate-y-0.5" aria-hidden="true" />
           <p className="text-ps-muted">
             Radicación habilitada{" "}
@@ -56,7 +59,7 @@ export default function Instructivo() {
             </video>
           </div>
 
-          <ul className="border-t border-ps-line">
+          <ul className="card !py-2" style={{ "--barra": "var(--color-ps-blue)" }}>
             {instructivos.map((doc) => (
               <Documento key={doc.id} doc={doc} />
             ))}
@@ -74,11 +77,14 @@ export default function Instructivo() {
 
         <div className="mt-10 grid md:grid-cols-3 gap-x-10 gap-y-12">
           {ROLES.map((rol) => (
-            <div key={rol.clave}>
-              <h3 className="pb-3 text-section font-medium text-ps-navy border-b-2 border-ps-navy">
+            <div key={rol.clave} className="card !p-0" style={{ "--barra": rol.color }}>
+              <h3
+                className="px-5 py-4 text-section font-semibold text-white"
+                style={{ background: rol.color }}
+              >
                 {rol.titulo}
               </h3>
-              <ul>
+              <ul className="px-5 py-1">
                 {(plantillas[rol.clave] || []).map((doc) => (
                   <Documento key={doc.id} doc={doc} />
                 ))}
@@ -95,8 +101,10 @@ export default function Instructivo() {
 
 function Encabezado({ numero, titulo, descripcion }) {
   return (
-    <div className="flex gap-6 md:gap-10 border-t border-ps-line pt-6">
-      <span className="eyebrow shrink-0 pt-1">{numero}</span>
+    <div className="flex gap-6 md:gap-10 border-t-2 border-ps-navy pt-6">
+      <span className="shrink-0 w-9 h-9 flex items-center justify-center bg-ps-navy text-white text-xs font-semibold">
+        {numero}
+      </span>
       <div className="max-w-xl">
         <h2 className="text-title font-semibold text-ps-navy">{titulo}</h2>
         <p className="mt-3 text-ps-muted">{descripcion}</p>
@@ -107,9 +115,9 @@ function Encabezado({ numero, titulo, descripcion }) {
 
 function Documento({ doc }) {
   return (
-    <li className="py-4 border-b border-ps-line">
+    <li className="py-4 border-b border-ps-line last:border-0">
       <p className="text-sm text-ps-ink leading-snug">
-        <span className="eyebrow mr-2">{doc.codigo}</span>
+        <span className="eyebrow mr-2 text-ps-blue">{doc.codigo}</span>
         {doc.titulo}
       </p>
 

@@ -20,10 +20,12 @@ export default function Dashboard() {
   return (
     <main className="max-w-5xl mx-auto px-6 pt-16 md:pt-20 pb-8">
       {/* ── Encabezado ──────────────────────────────────────────── */}
-      <div className="flex items-start justify-between gap-6 pb-8 border-b border-ps-line">
+      <div className="flex items-start justify-between gap-6 pb-8 border-b-2 border-ps-navy">
         <div>
-          <p className="eyebrow">{user?.role}</p>
-          <h1 className="mt-3 text-title font-semibold text-ps-navy">
+          <span className="inline-block px-2.5 py-1 bg-ps-blue-50 text-ps-blue text-[11px] font-semibold tracking-[0.14em] uppercase">
+            {user?.role}
+          </span>
+          <h1 className="mt-4 text-title font-semibold text-ps-navy">
             {user?.name || user?.username}
           </h1>
         </div>
@@ -33,19 +35,22 @@ export default function Dashboard() {
       </div>
 
       {/* ── Estado de la ventana ────────────────────────────────── */}
-      <div className="py-8 border-b border-ps-line">
-        <div className="flex items-baseline gap-3">
-          <span
-            className={`inline-block w-1.5 h-1.5 rounded-full translate-y-[-2px] ${
-              abierta ? "bg-ps-teal" : "bg-ps-warn"
-            }`}
-            aria-hidden="true"
-          />
-          <p className="text-section font-medium text-ps-ink">
-            {abierta ? "Ventana abierta" : "Ventana cerrada"}
-          </p>
-        </div>
-        <p className="mt-2 text-ps-muted pl-[18px]">
+      <div
+        className="cintillo my-8"
+        style={
+          abierta
+            ? { "--borde": "var(--color-ps-teal)", "--fondo": "var(--color-ps-teal-50)" }
+            : { "--borde": "var(--color-ps-warn)", "--fondo": "var(--color-ps-warn-50)" }
+        }
+      >
+        <p
+          className={`text-section font-semibold ${
+            abierta ? "text-ps-teal" : "text-ps-warn"
+          }`}
+        >
+          {abierta ? "Ventana abierta" : "Ventana cerrada"}
+        </p>
+        <p className="mt-1 text-sm text-ps-muted">
           La radicación está habilitada{" "}
           <span className="text-ps-ink font-medium">
             del {w.openFrom} al {w.openTo}
@@ -55,15 +60,15 @@ export default function Dashboard() {
       </div>
 
       {/* ── Calendario + formulario ─────────────────────────────── */}
-      <div className="grid lg:grid-cols-[auto_1fr] gap-12 lg:gap-16 pt-10">
+      <div className="grid lg:grid-cols-[auto_1fr] gap-8">
         <Calendario w={w} dias={dias} />
 
-        <div>
+        <div className="card" style={{ "--barra": "var(--color-ps-accent)" }}>
           <p className="eyebrow">Radicar</p>
-          <h2 className="mt-3 text-section font-medium text-ps-ink">
+          <h2 className="mt-2 text-section font-semibold text-ps-navy">
             Cuenta de cobro
           </h2>
-          <div className="mt-8">
+          <div className="mt-7">
             <UploadForm canUpload={abierta} user={user} />
           </div>
         </div>
@@ -73,16 +78,16 @@ export default function Dashboard() {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   Calendario: sin cajas ni bordes. El día habilitado se distingue
-   por peso tipográfico; hoy, por el punto naranja.
+   Calendario: los días habilitados van en turquesa sólido y hoy
+   se marca con un anillo naranja.
    ══════════════════════════════════════════════════════════════════ */
 function Calendario({ w, dias }) {
   const hoy = w.today.getDate();
 
   return (
-    <section className="lg:w-72">
+    <section className="card lg:w-72" style={{ "--barra": "var(--color-ps-teal)" }}>
       <p className="eyebrow">{w.tz}</p>
-      <h2 className="mt-3 text-section font-medium text-ps-ink">
+      <h2 className="mt-2 text-section font-semibold text-ps-navy">
         {etiquetaPeriodo(toPeriodo(w.today))}
       </h2>
 
@@ -99,34 +104,28 @@ function Calendario({ w, dias }) {
           const esHoy = d === hoy;
 
           return (
-            <div key={d} className="relative py-1.5">
+            <div key={d} className="relative py-0.5">
               <span
-                className={
+                className={`inline-flex items-center justify-center w-7 h-7 text-sm ${
                   habilitado
-                    ? "text-sm font-semibold text-ps-navy"
-                    : "text-sm text-ps-line"
-                }
+                    ? "bg-ps-teal text-white font-semibold"
+                    : "text-slate-300"
+                } ${esHoy ? "ring-2 ring-ps-accent ring-offset-1" : ""}`}
               >
                 {d}
               </span>
-              {esHoy && (
-                <span
-                  className="absolute left-1/2 -translate-x-1/2 bottom-0 w-1 h-1 rounded-full bg-ps-accent"
-                  aria-hidden="true"
-                />
-              )}
             </div>
           );
         })}
       </div>
 
-      <div className="mt-6 pt-4 border-t border-ps-line flex flex-col gap-2 text-xs text-ps-muted">
+      <div className="mt-5 pt-4 border-t border-ps-line flex flex-col gap-2.5 text-xs text-ps-muted">
         <span className="flex items-center gap-2">
-          <span className="font-semibold text-ps-navy">1</span>
+          <span className="w-4 h-4 bg-ps-teal" />
           Días habilitados
         </span>
         <span className="flex items-center gap-2">
-          <span className="w-1 h-1 rounded-full bg-ps-accent" />
+          <span className="w-4 h-4 ring-2 ring-ps-accent ring-inset" />
           Hoy
         </span>
       </div>

@@ -6,8 +6,8 @@ const link = ({ isActive }) =>
   [
     "relative py-1 text-sm transition-colors",
     isActive
-      ? "text-ps-ink font-medium after:absolute after:-bottom-0.5 after:left-0 after:right-0 after:h-px after:bg-ps-accent"
-      : "text-ps-muted hover:text-ps-ink",
+      ? "text-ps-blue font-semibold after:absolute after:-bottom-1 after:left-0 after:right-0 after:h-0.5 after:bg-ps-accent"
+      : "text-ps-muted hover:text-ps-blue",
   ].join(" ");
 
 export default function Header() {
@@ -22,7 +22,7 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-sm border-b border-ps-line">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b-2 border-ps-navy">
       <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between gap-6">
         <NavLink to="/" end className="flex items-center gap-3 shrink-0">
           <img

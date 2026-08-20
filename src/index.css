@@ -16,12 +16,22 @@
   /* Neutros */
   --color-ps-ink: #0b1420; /* texto principal */
   --color-ps-muted: #5b6673; /* texto secundario */
-  --color-ps-line: #e6e8ec; /* filetes de 1px */
+  --color-ps-line: #dde1e8; /* filetes de 1px */
   --color-ps-wash: #f7f8fa; /* fondo sutil */
+
+  /* Tintes de marca: fondos suaves derivados de los colores del logo */
+  --color-ps-blue-50: #eef4fc;
+  --color-ps-blue-100: #d8e6f7;
+  --color-ps-teal-50: #e6f6f8;
+  --color-ps-teal-100: #c9ebef;
+  --color-ps-accent-50: #fef4e8;
+  --color-ps-accent-100: #fce3c4;
 
   /* Estados */
   --color-ps-ok: #0f7a5f;
+  --color-ps-ok-50: #e8f5f1;
   --color-ps-warn: #b23c17;
+  --color-ps-warn-50: #fdeee9;
 
   /* Escala tipográfica editorial: títulos grandes y compactos */
   --text-display: 3.5rem;
@@ -168,4 +178,25 @@ a {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
   }
+}
+
+/* ── Tarjeta con franja de color arriba ─────────────────────────── */
+.card {
+  background: #fff;
+  border: 1px solid var(--color-ps-line);
+  border-top: 3px solid var(--barra, var(--color-ps-blue));
+  padding: 1.5rem;
+}
+
+/* Panel de marca: bloque de color liso que ancla la composición */
+.panel-marca {
+  background: var(--color-ps-navy);
+  color: #fff;
+}
+
+/* Cintillo de color para estados y avisos */
+.cintillo {
+  border-left: 3px solid var(--borde, var(--color-ps-blue));
+  background: var(--fondo, var(--color-ps-blue-50));
+  padding: 1rem 1.25rem;
 }

@@ -19,41 +19,23 @@ export default function Login() {
   };
 
   return (
-    <main className="max-w-5xl mx-auto px-6">
-      <div className="grid md:grid-cols-[1fr_auto] gap-14 md:gap-16 items-start pt-16 md:pt-20 pb-4">
-        {/* ── Titular ─────────────────────────────────────────── */}
-        <div className="max-w-xl">
+    <main className="max-w-5xl mx-auto px-6 py-10 md:py-14">
+      <div className="grid md:grid-cols-2 border border-ps-line">
+        {/* ── Formulario ──────────────────────────────────────── */}
+        <div className="p-8 sm:p-12">
           <p className="eyebrow">Preventiva Salud IPS</p>
-
-          <h1 className="mt-5 text-title md:text-display font-semibold text-ps-navy">
+          <h1 className="mt-4 text-title font-semibold text-ps-navy">
             Radicación de
             <br />
             cuentas de cobro
           </h1>
 
-          <div className="mt-8 flex items-baseline gap-3 border-t border-ps-line pt-5">
-            <span className="tick translate-y-0.5" aria-hidden="true" />
-            <p className="text-ps-muted">
-              Radica del{" "}
-              <span className="text-ps-ink font-medium">
-                {OPEN_FROM} al {OPEN_TO}
-              </span>{" "}
-              de cada mes.{" "}
-              <Link
-                to="/instructivo"
-                className="text-ps-blue hover:text-ps-navy font-medium underline underline-offset-4 decoration-ps-blue/40 hover:decoration-current transition-colors"
-              >
-                Ver instructivos
-              </Link>
-            </p>
-          </div>
-
-          {/* Formulario */}
-          <form onSubmit={onSubmit} className="mt-12 max-w-sm">
+          <form onSubmit={onSubmit} className="mt-10">
             {err && (
               <p
                 role="alert"
-                className="mb-6 border-l-2 border-ps-warn pl-3 text-sm text-ps-warn"
+                className="cintillo mb-7 text-sm text-ps-warn"
+                style={{ "--borde": "var(--color-ps-warn)", "--fondo": "var(--color-ps-warn-50)" }}
               >
                 {err}
               </p>
@@ -61,10 +43,7 @@ export default function Login() {
 
             <div className="space-y-7">
               <div>
-                <label
-                  htmlFor="usuario"
-                  className="eyebrow block mb-1.5"
-                >
+                <label htmlFor="usuario" className="eyebrow block mb-1.5">
                   Usuario
                 </label>
                 <input
@@ -78,10 +57,7 @@ export default function Login() {
               </div>
 
               <div>
-                <label
-                  htmlFor="clave"
-                  className="eyebrow block mb-1.5"
-                >
+                <label htmlFor="clave" className="eyebrow block mb-1.5">
                   Contraseña
                 </label>
                 <input
@@ -95,16 +71,16 @@ export default function Login() {
               </div>
             </div>
 
-            <button type="submit" className="btn-primary mt-10 w-full sm:w-auto">
+            <button type="submit" className="btn-primary mt-9 w-full">
               Iniciar sesión
               <span aria-hidden="true">→</span>
             </button>
 
-            <p className="mt-8 text-sm text-ps-muted">
+            <p className="mt-7 text-sm text-ps-muted">
               ¿No tienes cuenta?{" "}
               <Link
                 to="/register"
-                className="text-ps-ink font-medium underline underline-offset-4 decoration-ps-line hover:decoration-ps-accent transition-colors"
+                className="text-ps-blue font-medium underline underline-offset-4 decoration-ps-blue/40 hover:decoration-current transition-colors"
               >
                 Regístrate
               </Link>
@@ -112,14 +88,43 @@ export default function Login() {
           </form>
         </div>
 
-        {/* ── Logo ────────────────────────────────────────────── */}
-        <div className="hidden md:block w-64 pt-3">
-          <img
-            src="/logo-preventiva-marca.png"
-            alt="Preventiva Salud IPS"
-            className="w-full h-auto object-contain"
+        {/* ── Panel de marca ──────────────────────────────────── */}
+        <aside className="panel-marca relative overflow-hidden p-8 sm:p-12 flex flex-col justify-between gap-10 min-h-[22rem]">
+          {/* Aura del logo, muy tenue */}
+          <div
+            aria-hidden="true"
+            className="absolute -right-24 -top-24 w-80 h-80 rounded-full opacity-25 blur-3xl"
+            style={{ background: "var(--color-ps-teal)" }}
           />
-        </div>
+
+          <div className="relative">
+            <div className="bg-white/95 p-5 inline-block">
+              <img
+                src="/logo-preventiva-marca.png"
+                alt="Preventiva Salud IPS"
+                className="w-44 h-auto object-contain"
+              />
+            </div>
+          </div>
+
+          <div className="relative">
+            <p className="text-xs font-semibold tracking-[0.14em] uppercase text-ps-teal-100">
+              Ventana de radicación
+            </p>
+            <p className="mt-3 text-4xl font-semibold tracking-tight text-white">
+              {OPEN_FROM} — {OPEN_TO}
+            </p>
+            <p className="mt-2 text-sm text-white/70">de cada mes</p>
+
+            <Link
+              to="/instructivo"
+              className="mt-7 inline-flex items-center gap-2 border-b border-white/30 pb-1 text-sm font-medium text-white hover:border-ps-accent transition-colors"
+            >
+              Ver instructivos y formatos
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+        </aside>
       </div>
     </main>
   );
