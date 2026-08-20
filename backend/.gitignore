@@ -1,11 +1,16 @@
 # Node
 node_modules/
 npm-debug.log*
+
+# Secretos — NUNCA commitear
 .env
-.env.* 
+.env.*
+!.env.example
+
 # Vite/React
 dist/
 .vite/
+
 # Editor
 .DS_Store
 .vscode/
