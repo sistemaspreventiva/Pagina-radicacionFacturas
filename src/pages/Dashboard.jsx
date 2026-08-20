@@ -1,5 +1,5 @@
 import { useAuth } from "../context/AuthContext.jsx";
-import { getWindowForRole } from "../lib/dateWindow.js";
+import { getWindow } from "../lib/dateWindow.js";
 import UploadForm from "../components/UploadForm.jsx";
 
 const week = ["D", "L", "M", "X", "J", "V", "S"];
@@ -7,7 +7,7 @@ const week = ["D", "L", "M", "X", "J", "V", "S"];
 export default function Dashboard() {
   const { user, logout } = useAuth();
   const role = user?.role || "asistencial";
-  const w = getWindowForRole(role);
+  const w = getWindow();
 
   // 🔹 CAMBIO ÚNICO: capitalizar solo la primera letra del mes
   const rawMonthName = w.today.toLocaleDateString("es-CO", {
@@ -44,17 +44,13 @@ export default function Dashboard() {
       </div>
 
       <div className="mt-4 p-3 rounded-xl border bg-white">
-        {role === "conductor" ? (
-          <p className="text-green-700">
-            Para tu rol (<b>Conductor</b>) la radicación está{" "}
-            <b>habilitada del 1 al 10 de cada mes</b>.
-          </p>
-        ) : (
-          <p className="text-slate-700">
-            Para tu rol (<b>{role}</b>) la radicación está{" "}
-            <b>habilitada del 1 al 10 de cada mes</b>.
-          </p>
-        )}
+        <p className="text-slate-700">
+          La radicación está{" "}
+          <b>
+            habilitada del {w.openFrom} al {w.openTo} de cada mes
+          </b>{" "}
+          para todos los roles.
+        </p>
         <p
           className={`mt-1 text-sm ${
             canUploadToday ? "text-green-700" : "text-red-600"

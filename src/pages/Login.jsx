@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
+import { OPEN_FROM, OPEN_TO } from "../lib/dateWindow.js";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -54,12 +55,12 @@ export default function Login() {
 
           <div className="hidden md:block">
             <div className="relative rounded-2xl overflow-hidden border aspect-[4/3]">
-              <img src="./logo-preventiva.png" alt="Preventiva Salud IPS" className="w-full h-full object-cover" />
+              <img src="/logo-preventiva.png" alt="Preventiva Salud IPS" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-br from-[var(--ps-cyan)]/25 via-[var(--ps-blue)]/20 to-[var(--ps-orange)]/20 mix-blend-multiply" />
               <div className="absolute inset-0 ring-1 ring-white/30"></div>
             </div>
             <p className="mt-3 text-sm text-slate-600">
-              Suba sus cuentas de cobro de forma segura los primeros 10 días de cada mes.
+              Suba sus cuentas de cobro de forma segura del {OPEN_FROM} al {OPEN_TO} de cada mes.
             </p>
           </div>
         </div>

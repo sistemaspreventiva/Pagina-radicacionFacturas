@@ -57,7 +57,7 @@ export default function Register() {
               placeholder="Solo números"
             />
             <p className="text-xs text-slate-500 mt-1">
-              Se usará para generar el consecutivo automático (DSDDYY-CC).
+              Se usará para generar el consecutivo automático (DSMMYY-CC).
             </p>
           </div>
 

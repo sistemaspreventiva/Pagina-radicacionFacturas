@@ -1,5 +1,8 @@
 // src/pages/Instructivo.jsx
 import { instructivos } from "../lib/instructivos.js";
+import { OPEN_FROM, OPEN_TO } from "../lib/dateWindow.js";
+
+const VENTANA = `Radicación habilitada del ${OPEN_FROM} al ${OPEN_TO} de cada mes.`;
 
 export default function Instructivo() {
   return (
@@ -73,19 +76,19 @@ export default function Instructivo() {
         <Card
           titulo="Asistencial"
         
-          descripcion="Formatos y guías para personal asistencial. Radicación habilitada del 1 al 10 de cada mes."
+          descripcion={`Formatos y guías para personal asistencial. ${VENTANA}`}
           items={Array.isArray(instructivos.asistencial) ? instructivos.asistencial : []}
           color="border-cyan-500"
         />
         <Card
           titulo="Administrativo"
-          descripcion="Formatos y guías para personal administrativo. Radicación habilitada del 1 al 10 de cada mes."
+          descripcion={`Formatos y guías para personal administrativo. ${VENTANA}`}
           items={Array.isArray(instructivos.administrativo) ? instructivos.administrativo : []}
           color="border-blue-600"
         />
         <Card
           titulo="Transporte / Conductores"
-          descripcion="Formatos y guías para personal de transporte. Radicación habilitada del 1 al 10 de cada mes."
+          descripcion={`Formatos y guías para personal de transporte. ${VENTANA}`}
           items={Array.isArray(instructivos.conductores) ? instructivos.conductores : []}
           color="border-orange-500"
         />

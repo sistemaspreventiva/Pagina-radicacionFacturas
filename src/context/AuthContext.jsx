@@ -1,5 +1,5 @@
 // src/context/AuthContext.jsx
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext(null);
 export const ROLES = ["asistencial", "conductor", "administrativo"];
@@ -13,21 +13,30 @@ function writeUsers(list) { localStorage.setItem("users", JSON.stringify(list));
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  // false hasta terminar de leer localStorage: evita expulsar al login al refrescar
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const raw = localStorage.getItem("session");
-    if (raw) {
-      const s = JSON.parse(raw);
-      setUser(s.user); setToken(s.token);
+    try {
+      const raw = localStorage.getItem("session");
+      if (raw) {
+        const s = JSON.parse(raw);
+        setUser(s.user); setToken(s.token);
+      }
+    } catch {
+      localStorage.removeItem("session"); // sesion corrupta: se descarta
+    } finally {
+      setReady(true);
     }
   }, []);
 
   const login = (username, password) => {
     const u = readUsers().find(x => x.username === username && x.password === password);
     if (!u) return false;
-    const session = { user: u, token: "local-token" };
+    const { password: _omit, ...perfil } = u; // la clave no viaja a la sesion
+    const session = { user: perfil, token: "local-token" };
     localStorage.setItem("session", JSON.stringify(session));
-    setUser(u); setToken(session.token);
+    setUser(perfil); setToken(session.token);
     return true;
   };
 
@@ -46,16 +55,8 @@ export function AuthProvider({ children }) {
     return true;
   };
 
-  // ventana de radicación (1-10 para roles no conductores)
-  const canUploadToday = useMemo(() => {
-    if (!user) return false;
-    if (user.role === "conductor") return true;
-    const d = new Date();
-    const day = d.getDate();
-    return day >= 1 && day <= 10;
-  }, [user]);
-
-  const value = { user, token, login, logout, register, ROLES, canUploadToday };
+  // La ventana de radicación vive en src/lib/dateWindow.js (una sola fuente de verdad).
+  const value = { user, token, ready, login, logout, register, ROLES };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 export function useAuth() { return useContext(AuthContext); }

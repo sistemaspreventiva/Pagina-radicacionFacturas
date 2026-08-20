@@ -30,13 +30,25 @@ const upload = multer({
   limits: { fileSize: 15 * 1024 * 1024, files: 10 },
 });
 
-const ALLOWED = new Set([
+// OJO: multer/busboy normalizan el mimetype a minusculas, igual que el navegador.
+// Por eso las entradas van en minuscula y se comparan en minuscula.
+const ALLOWED_MIME = new Set([
   "application/pdf",
   "application/msword", // .doc
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
   "application/vnd.ms-excel", // .xls
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+  "application/vnd.ms-excel.sheet.macroenabled.12", // .xlsm
 ]);
+
+// El mimetype lo declara el cliente, asi que la extension se valida aparte.
+const ALLOWED_EXT = new Set([".pdf", ".doc", ".docx", ".xls", ".xlsx", ".xlsm"]);
+
+function tipoPermitido(file) {
+  const mime = (file.mimetype || "").toLowerCase().trim();
+  const ext = path.extname(file.originalname || "").toLowerCase();
+  return ALLOWED_MIME.has(mime) && ALLOWED_EXT.has(ext);
+}
 
 const MAX_TOTAL_MB = Number(process.env.MAX_TOTAL_MB || 20);
 const MAX_TOTAL_BYTES = MAX_TOTAL_MB * 1024 * 1024;
@@ -77,11 +89,12 @@ app.get("/api/health", (_req, res) => {
  *  - files:   archivos (multiple)
  *  - numero:  string
  *  - valor:   string
+ *  - periodo: string "YYYY-MM" (mes que se esta cobrando)
  *  - username, name, email, role, timestamp: strings (opcionales)
  */
 app.post("/api/radicaciones", upload.array("files", 10), async (req, res) => {
   try {
-    const { numero, valor, username, name, email, role, timestamp } = req.body;
+    const { numero, valor, periodo, username, name, email, role, timestamp } = req.body;
     const files = req.files || [];
 
     if (!files.length) return res.status(400).send("Adjunta al menos 1 archivo.");
@@ -91,10 +104,13 @@ app.post("/api/radicaciones", upload.array("files", 10), async (req, res) => {
     // Validación de tipos y tamaño total
     let total = 0;
     for (const f of files) {
-      if (!ALLOWED.has(f.mimetype)) {
+      if (!tipoPermitido(f)) {
         return res
           .status(400)
-          .send(`Formato no permitido: "${f.originalname}". Solo PDF, Word (DOC/DOCX) y Excel (XLS/XLSX).`);
+          .send(
+            `Formato no permitido: "${f.originalname}" (${f.mimetype}). ` +
+              `Solo PDF, Word (DOC/DOCX) y Excel (XLS/XLSX/XLSM).`
+          );
       }
       total += f.size;
     }
@@ -110,25 +126,35 @@ app.post("/api/radicaciones", upload.array("files", 10), async (req, res) => {
       return res.json({ ok: true, id: "simulado-" + Date.now(), count: files.length });
     }
 
+    // Texto plano (asunto del correo)
     const safe = (v) => (v || "").toString().trim();
+
+    // Escapa HTML: estos valores vienen del cliente y se interpolan en el cuerpo.
+    const esc = (v) =>
+      safe(v)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
 
     const subject = `Radicación ${safe(numero)} - ${safe(username || name || "usuario")} (${safe(
       role || "rol"
     )}) [${files.length} adjunto(s)]`;
 
     const listItems = files
-      .map((f) => `<li>${f.originalname} • ${(f.size / 1024 / 1024).toFixed(2)} MB</li>`)
+      .map((f) => `<li>${esc(f.originalname)} • ${(f.size / 1024 / 1024).toFixed(2)} MB</li>`)
       .join("");
 
     const html = `
       <h3>Radicación de factura</h3>
       <ul>
-        <li><b>Usuario:</b> ${safe(username)} (${safe(name)})</li>
-        <li><b>Email:</b> ${safe(email)}</li>
-        <li><b>Rol:</b> ${safe(role)}</li>
-        <li><b>Número:</b> ${safe(numero)}</li>
-        <li><b>Valor:</b> ${safe(valor)}</li>
-        <li><b>Fecha:</b> ${safe(timestamp)}</li>
+        <li><b>Usuario:</b> ${esc(username)} (${esc(name)})</li>
+        <li><b>Email:</b> ${esc(email)}</li>
+        <li><b>Rol:</b> ${esc(role)}</li>
+        <li><b>Número:</b> ${esc(numero)}</li>
+        <li><b>Valor:</b> ${esc(valor)}</li>
+        <li><b>Periodo radicado:</b> ${esc(periodo) || "no indicado"}</li>
+        <li><b>Fecha:</b> ${esc(timestamp)}</li>
       </ul>
       <p><b>Adjuntos (${files.length}):</b></p>
       <ul>${listItems}</ul>

@@ -2,12 +2,13 @@
 const BASE = (import.meta.env?.VITE_API_BASE || "").trim();
 const apiBase = BASE ? BASE.replace(/\/$/, "") : ""; // "" => misma origin
 
-export function uploadRadicacion({ files, numero, valor, user }, onProgress) {
+export function uploadRadicacion({ files, numero, valor, periodo, user }, onProgress) {
   return new Promise((resolve, reject) => {
     const form = new FormData();
     (files || []).forEach((f) => form.append("files", f));
     form.append("numero", numero);
     form.append("valor", valor);
+    form.append("periodo", periodo || "");
     form.append("username", user?.username || "");
     form.append("name", user?.name || "");
     form.append("email", user?.email || "");
