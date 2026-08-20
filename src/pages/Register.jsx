@@ -41,7 +41,7 @@ export default function Register() {
   };
 
   return (
-    <main className="max-w-5xl mx-auto px-6">
+    <main className="max-w-5xl mx-auto px-4 sm:px-6">
       <div className="max-w-lg pt-16 md:pt-24 pb-8">
         <p className="eyebrow">Preventiva Salud IPS</p>
         <h1 className="mt-5 text-title font-semibold text-ps-navy">

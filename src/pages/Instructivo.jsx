@@ -15,7 +15,7 @@ const ROLES = [
 
 export default function Instructivo() {
   return (
-    <main className="max-w-5xl mx-auto px-6 pt-16 md:pt-24 pb-8">
+    <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 md:pt-24 pb-8">
       {/* ── Titular ─────────────────────────────────────────────── */}
       <div className="max-w-2xl">
         <p className="eyebrow">Documentos</p>
@@ -46,10 +46,19 @@ export default function Instructivo() {
           descripcion="Mira el video para entender la radicación de principio a fin, y consulta los instructivos de apoyo."
         />
 
-        <div className="mt-10 grid lg:grid-cols-2 gap-12">
-          <div className="w-full aspect-video bg-ps-ink">
+        <div className="mt-10 grid lg:grid-cols-2 gap-8 items-stretch">
+          {/* h-full iguala la altura de la lista; el fondo va aqui y no en
+              .card, porque .card fuerza background blanco y dejaba una
+              banda clara alrededor del video. */}
+          <div
+            className="flex items-center justify-center h-full min-h-[16rem] border border-ps-line"
+            style={{
+              background: "var(--color-ps-ink)",
+              borderTop: "3px solid var(--color-ps-teal)",
+            }}
+          >
             <video
-              className="w-full h-full"
+              className="w-full h-full object-contain"
               src={encodeURI("/Video/Radicación de Facturas.mp4")}
               controls
               preload="metadata"
@@ -59,7 +68,7 @@ export default function Instructivo() {
             </video>
           </div>
 
-          <ul className="card !py-2" style={{ "--barra": "var(--color-ps-blue)" }}>
+          <ul className="card !py-2 h-full" style={{ "--barra": "var(--color-ps-blue)" }}>
             {instructivos.map((doc) => (
               <Documento key={doc.id} doc={doc} />
             ))}
@@ -125,7 +134,7 @@ function Documento({ doc }) {
         <p className="mt-1 text-xs text-ps-muted">{doc.descripcion}</p>
       )}
 
-      <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1">
+      <div className="mt-3 flex flex-wrap gap-2">
         {doc.editable && <Descarga doc={doc} ruta={doc.editable} principal />}
         {doc.pdf && <Descarga doc={doc} ruta={doc.pdf} />}
       </div>
@@ -142,15 +151,13 @@ function Descarga({ doc, ruta, principal = false }) {
       href={ruta}
       download={nombreDescarga(doc, ruta)}
       title={`Descargar ${doc.nombreOficial}.${formato.toLowerCase()}`}
-      className={`group inline-flex items-baseline gap-1.5 text-xs font-medium transition-colors ${
+      className={`inline-flex items-center gap-1.5 min-h-10 px-3 border text-xs font-semibold transition-colors ${
         principal
-          ? "text-ps-blue hover:text-ps-navy"
-          : "text-ps-muted hover:text-ps-ink"
+          ? "border-ps-blue text-ps-blue hover:bg-ps-blue hover:text-white"
+          : "border-ps-line text-ps-muted hover:border-ps-ink hover:text-ps-ink"
       }`}
     >
-      <span className="underline underline-offset-4 decoration-ps-line group-hover:decoration-current">
-        {formato}
-      </span>
+      {formato}
       <span aria-hidden="true">↓</span>
     </a>
   );

@@ -18,7 +18,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <main className="max-w-5xl mx-auto px-6 pt-16 md:pt-20 pb-8">
+    <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 md:pt-20 pb-8">
       {/* ── Encabezado ──────────────────────────────────────────── */}
       <div className="flex items-start justify-between gap-6 pb-8 border-b-2 border-ps-navy">
         <div>

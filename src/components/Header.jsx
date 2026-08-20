@@ -23,17 +23,17 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b-2 border-ps-navy">
-      <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between gap-6">
-        <NavLink to="/" end className="flex items-center gap-3 shrink-0">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3 sm:gap-6">
+        <NavLink to="/" end className="flex items-center gap-2.5 min-w-0">
           <img
             src="/logo-preventiva-marca.png"
             alt=""
-            className="h-7 w-auto object-contain"
+            className="h-7 w-auto object-contain shrink-0"
             onError={(e) => (e.currentTarget.style.display = "none")}
           />
-          <span className="leading-none">
-            <span className="block eyebrow">Preventiva Salud IPS</span>
-            <span className="block mt-1 text-sm font-medium text-ps-ink tracking-tight">
+          <span className="leading-none min-w-0">
+            <span className="block eyebrow truncate">Preventiva Salud IPS</span>
+            <span className="block mt-1 text-sm font-medium text-ps-ink tracking-tight truncate">
               Radicación de cuentas de cobro
             </span>
           </span>
@@ -63,7 +63,7 @@ export default function Header() {
 
         <button
           onClick={() => setOpen((v) => !v)}
-          className="md:hidden -mr-2 p-2 text-ps-ink"
+          className="md:hidden -mr-1 p-2 shrink-0 text-ps-ink"
           aria-expanded={open}
           aria-label="Menú"
         >
@@ -89,7 +89,7 @@ export default function Header() {
 
       {open && (
         <nav className="md:hidden border-t border-ps-line bg-white">
-          <div className="max-w-5xl mx-auto px-6 py-4 flex flex-col gap-4">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex flex-col gap-4">
             <NavLink onClick={() => setOpen(false)} to="/" end className={link}>
               Inicio
             </NavLink>

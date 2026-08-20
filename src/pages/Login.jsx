@@ -19,10 +19,10 @@ export default function Login() {
   };
 
   return (
-    <main className="max-w-5xl mx-auto px-6 py-10 md:py-14">
+    <main className="max-w-5xl mx-auto px-4 sm:px-6 py-10 md:py-14">
       <div className="grid md:grid-cols-2 border border-ps-line">
         {/* ── Formulario ──────────────────────────────────────── */}
-        <div className="p-8 sm:p-12">
+        <div className="p-6 sm:p-10 lg:p-12">
           <p className="eyebrow">Preventiva Salud IPS</p>
           <h1 className="mt-4 text-title font-semibold text-ps-navy">
             Radicación de
@@ -89,36 +89,30 @@ export default function Login() {
         </div>
 
         {/* ── Panel de marca ──────────────────────────────────── */}
-        <aside className="panel-marca relative overflow-hidden p-8 sm:p-12 flex flex-col justify-between gap-10 min-h-[22rem]">
-          {/* Aura del logo, muy tenue */}
+        <aside className="relative overflow-hidden bg-ps-blue-50 border-t md:border-t-0 md:border-l border-ps-line p-6 sm:p-10 flex flex-col justify-center gap-8 sm:gap-10">
+          {/* Aura muy tenue, recordando el halo del logo */}
           <div
             aria-hidden="true"
-            className="absolute -right-24 -top-24 w-80 h-80 rounded-full opacity-25 blur-3xl"
-            style={{ background: "var(--color-ps-teal)" }}
+            className="absolute -right-20 -top-20 w-72 h-72 rounded-full opacity-40 blur-3xl"
+            style={{ background: "var(--color-ps-teal-100)" }}
           />
 
-          <div className="relative">
-            <div className="bg-white/95 p-5 inline-block">
-              <img
-                src="/logo-preventiva-marca.png"
-                alt="Preventiva Salud IPS"
-                className="w-44 h-auto object-contain"
-              />
-            </div>
-          </div>
+          <img
+            src="/logo-preventiva-marca.png"
+            alt="Preventiva Salud IPS"
+            className="relative w-full max-w-xs mx-auto h-auto object-contain"
+          />
 
-          <div className="relative">
-            <p className="text-xs font-semibold tracking-[0.14em] uppercase text-ps-teal-100">
-              Ventana de radicación
+          <div className="relative text-center">
+            <p className="eyebrow text-ps-blue">Ventana de radicación</p>
+            <p className="mt-2 text-5xl font-semibold tracking-tight text-ps-navy">
+              {OPEN_FROM} <span className="text-ps-teal">—</span> {OPEN_TO}
             </p>
-            <p className="mt-3 text-4xl font-semibold tracking-tight text-white">
-              {OPEN_FROM} — {OPEN_TO}
-            </p>
-            <p className="mt-2 text-sm text-white/70">de cada mes</p>
+            <p className="mt-1 text-sm text-ps-muted">de cada mes</p>
 
             <Link
               to="/instructivo"
-              className="mt-7 inline-flex items-center gap-2 border-b border-white/30 pb-1 text-sm font-medium text-white hover:border-ps-accent transition-colors"
+              className="mt-6 inline-flex items-center gap-2 border-b-2 border-ps-accent pb-1 text-sm font-semibold text-ps-navy hover:text-ps-blue transition-colors"
             >
               Ver instructivos y formatos
               <span aria-hidden="true">→</span>
