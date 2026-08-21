@@ -287,23 +287,12 @@ function ubicar(caja, ancho, alto) {
    levantada. Se voltea y se inclina para que ese brazo apunte hacia lo
    que hay que mirar, y del brazo sale un rastro de puntitos que remata
    el gesto. Así siempre concuerda con el cuerpo. */
+/* Inclinación de la figura según hacia dónde queda el elemento. */
 const COLOCACION = {
-  // globo debajo -> el elemento queda ARRIBA
-  abajo: { espejo: false, giro: -6, rastro: "arriba" },
-  // globo encima -> el elemento queda ABAJO
-  arriba: { espejo: false, giro: -6, rastro: "abajo" },
-  // globo a la derecha -> el elemento queda a la IZQUIERDA
-  derecha: { espejo: false, giro: -14, rastro: "izquierda" },
-  // globo a la izquierda -> el elemento queda a la DERECHA
-  izquierda: { espejo: true, giro: -14, rastro: "derecha" },
-};
-
-// Dónde nace el rastro (junto a la patita levantada) y hacia dónde va
-const RASTRO = {
-  arriba: { left: "50%", top: -6, dir: "translateY(-16px)", fila: "column-reverse" },
-  abajo: { left: "50%", bottom: -6, dir: "translateY(16px)", fila: "column" },
-  izquierda: { left: -8, top: "34%", dir: "translateX(-16px)", fila: "row-reverse" },
-  derecha: { right: -8, top: "34%", dir: "translateX(16px)", fila: "row" },
+  abajo: { giro: -6 },
+  arriba: { giro: -6 },
+  derecha: { giro: -14 },
+  izquierda: { giro: -14 },
 };
 
 function Senalador({ lado, caja, onNoCabe }) {
@@ -311,7 +300,6 @@ function Senalador({ lado, caja, onNoCabe }) {
   const ref = useRef(null);
   const [alterno, setAlterno] = useState(false);
 
-  // Si la mascota se monta sobre la zona resaltada, se cambia de lado
   useLayoutEffect(() => {
     setAlterno(false);
   }, [lado]);
@@ -324,55 +312,99 @@ function Senalador({ lado, caja, onNoCabe }) {
       b.right > caja.left && b.left < caja.left + caja.width &&
       b.bottom > caja.top && b.top < caja.top + caja.height;
     if (!choca) return;
-    // primero se prueba el otro lado; si tampoco cabe (elementos que
-    // ocupan todo el ancho) se repliega dentro del globo.
+    // primero el otro lado; si tampoco cabe, se repliega dentro del globo
     if (!alterno) setAlterno(true);
     else onNoCabe?.();
   }, [caja, alterno, lado, onNoCabe]);
 
   if (!c) return null;
 
-  // Lado por defecto: el contrario al elemento. Si choca, el otro.
-  const posicion = (lado === "derecha" ? alterno : !alterno)
+  const aLaIzquierda = lado === "derecha" ? alterno : !alterno;
+
+  // Regla única y siempre coherente: la mascota se planta a un lado del
+  // globo, se voltea para MIRAR hacia él y estira la patita en esa misma
+  // dirección. Así el gesto nunca apunta hacia su propio cuerpo.
+  const posicion = aLaIzquierda
     ? { left: 0, top: "50%", "--pos": `translate(-108%, -50%) rotate(${c.giro}deg)` }
     : { right: 0, top: "50%", "--pos": `translate(108%, -50%) rotate(${-c.giro}deg)` };
 
-  const r = RASTRO[c.rastro];
-  const { dir, fila, ...anclaje } = r;
-
   return (
-    <div ref={ref} className="guia-mascota" style={posicion}>
-      {/* halo blanco: la mascota es casi blanca y sin esto se deslavaba */}
+    <div
+      ref={ref}
+      className="guia-mascota w-32 h-32 sm:w-40 sm:h-40"
+      style={posicion}
+    >
+      {/* halo: la mascota es casi blanca y sin esto se deslavaba */}
       <div
         aria-hidden="true"
         className="absolute inset-0 rounded-full blur-xl"
         style={{ background: "radial-gradient(closest-side, rgba(255,255,255,0.95), rgba(255,255,255,0))" }}
       />
       <Mascota
-        className="relative w-32 h-32 sm:w-40 sm:h-40 drop-shadow-2xl"
-        style={c.espejo ? { transform: "scaleX(-1)" } : undefined}
+        className="relative w-full h-full drop-shadow-2xl"
+        style={aLaIzquierda ? { transform: "scaleX(-1)" } : undefined}
       />
 
-      {/* rastro que sale de la patita hacia lo señalado */}
-      <span
-        aria-hidden="true"
-        className="absolute flex items-center gap-1.5"
-        style={{ ...anclaje, flexDirection: fila }}
-      >
-        {[0, 1, 2].map((i) => (
-          <span
-            key={i}
-            className="guia-punto rounded-full bg-ps-accent"
-            style={{
-              width: 9 - i * 2,
-              height: 9 - i * 2,
-              "--ida": dir,
-              animationDelay: `${i * 0.16}s`,
-            }}
-          />
-        ))}
-      </span>
+      {/* la patita sale del brazo levantado, que tras el volteo queda
+          siempre del lado del globo */}
+      <PatitaSenala
+        style={{
+          top: "20%",
+          ...(aLaIzquierda ? { right: "-20%" } : { left: "-20%" }),
+          "--giro": aLaIzquierda ? "rotate(0deg)" : "scaleX(-1)",
+        }}
+      />
     </div>
+  );
+}
+
+/* Patita del leopardito señalando: puñito y dedito extendido en una
+   sola silueta. En su orientación natural apunta a la derecha. */
+function PatitaSenala({ style }) {
+  const FUR = "#FFFFFF";
+  const BORDE = "#9FB0C2";
+  const BEAN = "#F6C3A9";
+  const BEAN_B = "#DE9A7C";
+
+  return (
+    <svg
+      viewBox="0 0 48 48"
+      className="guia-patita absolute w-12 h-12 sm:w-14 sm:h-14 drop-shadow-lg"
+      style={style}
+      aria-hidden="true"
+    >
+      {/* muñequera turquesa, como la de la mascota */}
+      <rect x="0" y="15" width="12" height="19" rx="6" fill="#009CB4" />
+      <rect x="8.5" y="16.5" width="4" height="16" rx="2" fill="#00808F" />
+
+      {/* silueta: puño y dedito de un solo trazo */}
+      <path
+        d="M9 13.5
+           q7-3.6 13.4 0.4
+           q4.2 2.6 5.6 5.6
+           h10.4
+           a4.9 4.9 0 0 1 0 9.8
+           H28
+           q-1.3 3.5-5.6 6.1
+           q-6.4 3.8-13.4 0.4
+           Z"
+        fill={FUR}
+        stroke={BORDE}
+        strokeWidth="1.9"
+        strokeLinejoin="round"
+      />
+
+      <ellipse cx="36.4" cy="24.3" rx="3.1" ry="3.4" fill={BEAN} />
+      <ellipse cx="14.6" cy="18.6" rx="2.6" ry="2.9" fill={BEAN} />
+      <ellipse cx="20.4" cy="16.9" rx="2.6" ry="2.9" fill={BEAN} />
+      <path
+        d="M17.5 24.4 q5.6-0.6 6.8 3.4 q1.2 4.2-3.2 5.8
+           q-4.6 1.6-7.4-1.1 q-2.4-2.4-0.5-5.4 q1.5-2.3 4.3-2.7 Z"
+        fill={BEAN}
+      />
+      <path d="M18.2 27 q3.4 0.2 4 2.6" stroke={BEAN_B} strokeWidth="1.3"
+            fill="none" strokeLinecap="round" opacity="0.55" />
+    </svg>
   );
 }
 

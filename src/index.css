@@ -313,9 +313,8 @@ button:hover > .mascota { transform: rotate(-4deg) scale(1.05); }
 
 .guia-mascota {
   position: absolute;
-  display: grid;
-  place-items: center;
   pointer-events: none;
+  isolation: isolate;
   animation: g-entra 0.45s cubic-bezier(0.34, 1.4, 0.64, 1) both,
              g-flota 3s ease-in-out 0.45s infinite;
 }
@@ -332,3 +331,15 @@ button:hover > .mascota { transform: rotate(-4deg) scale(1.05); }
 }
 .guia-punto { animation: g-punto 1.3s ease-out infinite; }
 @media (prefers-reduced-motion: reduce) { .guia-punto { animation: none; opacity: 0.8; } }
+
+/* La patita estirada late suavemente hacia lo que señala */
+@keyframes g-patita {
+  0%, 100% { transform: var(--giro, rotate(0deg)) translateX(0); }
+  50%      { transform: var(--giro, rotate(0deg)) translateX(5px); }
+}
+.guia-patita {
+  transform: var(--giro, rotate(0deg));
+  transform-origin: 25% 50%;
+  animation: g-patita 1.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) { .guia-patita { animation: none; } }
