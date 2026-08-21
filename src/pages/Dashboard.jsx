@@ -53,10 +53,8 @@ export default function Dashboard() {
         </p>
         <p className="mt-1 text-sm text-ps-muted">
           La radicación está habilitada{" "}
-          <span className="text-ps-ink font-medium">
-            del {w.openFrom} al {w.openTo}
-          </span>{" "}
-          de cada mes, para todos los roles.
+          <span className="text-ps-ink font-medium">{w.texto}</span>, para
+          todos los roles.
         </p>
       </div>
 
@@ -123,7 +121,7 @@ function Calendario({ w, dias }) {
       <div className="mt-5 pt-4 border-t border-ps-line flex flex-col gap-2.5 text-xs text-ps-muted">
         <span className="flex items-center gap-2">
           <span className="w-4 h-4 bg-ps-teal" />
-          Días habilitados
+          {w.mesCompleto ? "Todo el mes habilitado" : "Días habilitados"}
         </span>
         <span className="flex items-center gap-2">
           <span className="w-4 h-4 ring-2 ring-ps-accent ring-inset" />

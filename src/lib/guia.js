@@ -5,9 +5,9 @@
 // Si el elemento no existe en pantalla (por ejemplo algo que solo se ve
 // en escritorio), el paso se omite solo en vez de romper el recorrido.
 
-import { OPEN_FROM, OPEN_TO } from "./dateWindow.js";
+import { textoVentana } from "./dateWindow.js";
 
-const VENTANA = `del ${OPEN_FROM} al ${OPEN_TO}`;
+const VENTANA = textoVentana();
 
 export const RECORRIDOS = {
   "/": {
@@ -28,7 +28,7 @@ export const RECORRIDOS = {
       {
         objetivo: "login-ventana",
         titulo: "Cuándo puedes radicar",
-        texto: `La radicación está habilitada ${VENTANA} de cada mes. Fuera de esos días el formulario queda bloqueado, así que no dejes el envío para después.`,
+        texto: `La radicación está habilitada ${VENTANA}. Cuando la ventana se cierra el formulario queda bloqueado, así que no dejes el envío para el final.`,
       },
       {
         objetivo: "login-instructivos",
@@ -74,7 +74,7 @@ export const RECORRIDOS = {
       {
         objetivo: "dash-estado",
         titulo: "Primero: ¿está abierta la ventana?",
-        texto: `Si dice «Ventana abierta» puedes enviar. Si dice «cerrada», el botón queda bloqueado hasta el próximo periodo ${VENTANA}.`,
+        texto: `Si dice «Ventana abierta» puedes enviar. Si dice «cerrada», el botón queda bloqueado. Ahora mismo está habilitada ${VENTANA}.`,
       },
       {
         objetivo: "dash-calendario",

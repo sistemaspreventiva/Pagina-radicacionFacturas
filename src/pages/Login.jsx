@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
-import { OPEN_FROM, OPEN_TO } from "../lib/dateWindow.js";
+import { MES_COMPLETO, OPEN_FROM, OPEN_TO, getWindow } from "../lib/dateWindow.js";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -105,10 +105,23 @@ export default function Login() {
 
           <div className="relative text-center" data-guia="login-ventana">
             <p className="eyebrow text-ps-blue">Ventana de radicación</p>
-            <p className="mt-2 text-5xl font-semibold tracking-tight text-ps-navy">
-              {OPEN_FROM} <span className="text-ps-teal">—</span> {OPEN_TO}
-            </p>
-            <p className="mt-1 text-sm text-ps-muted">de cada mes</p>
+            {MES_COMPLETO ? (
+              <>
+                <p className="mt-2 text-4xl font-semibold tracking-tight text-ps-navy">
+                  Todo el mes
+                </p>
+                <p className="mt-1 text-sm text-ps-muted">
+                  cualquier día, del 1 al {getWindow().lastDate}
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="mt-2 text-5xl font-semibold tracking-tight text-ps-navy">
+                  {OPEN_FROM} <span className="text-ps-teal">—</span> {OPEN_TO}
+                </p>
+                <p className="mt-1 text-sm text-ps-muted">de cada mes</p>
+              </>
+            )}
 
             <Link
               to="/instructivo"

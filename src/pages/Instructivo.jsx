@@ -5,7 +5,7 @@ import {
   formatoDe,
   nombreDescarga,
 } from "../lib/instructivos.js";
-import { OPEN_FROM, OPEN_TO } from "../lib/dateWindow.js";
+import { textoVentana } from "../lib/dateWindow.js";
 
 const ROLES = [
   { clave: "asistencial", titulo: "Asistencial", color: "var(--color-ps-teal)" },
@@ -30,10 +30,7 @@ export default function Instructivo() {
           <span className="tick translate-y-0.5" aria-hidden="true" />
           <p className="text-ps-muted">
             Radicación habilitada{" "}
-            <span className="text-ps-ink font-medium">
-              del {OPEN_FROM} al {OPEN_TO}
-            </span>{" "}
-            de cada mes.
+            <span className="text-ps-ink font-medium">{textoVentana()}</span>.
           </p>
         </div>
       </div>

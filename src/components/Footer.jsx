@@ -1,4 +1,4 @@
-import { OPEN_FROM, OPEN_TO } from "../lib/dateWindow.js";
+import { textoVentana } from "../lib/dateWindow.js";
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -9,10 +9,7 @@ export default function Footer() {
         <p className="text-sm text-white/70">© {year} Preventiva Salud IPS</p>
         <p className="text-sm text-white/70">
           Radicación habilitada{" "}
-          <span className="text-white font-medium">
-            del {OPEN_FROM} al {OPEN_TO}
-          </span>{" "}
-          de cada mes
+          <span className="text-white font-medium">{textoVentana()}</span>
         </p>
       </div>
     </footer>

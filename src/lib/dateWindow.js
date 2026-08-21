@@ -1,9 +1,31 @@
 // src/lib/dateWindow.js
 const TZ = "America/Bogota";
 
-// Ventana de radicación: del 1 al 5 de cada mes, para TODOS los roles.
+// Ventana de radicación, igual para TODOS los roles.
+//
+// Con MES_COMPLETO en true se puede radicar cualquier día del mes. El
+// último día se calcula de verdad (28, 29, 30 o 31), porque fijarlo en
+// 30 dejaba fuera el 31 en los meses que lo tienen.
+//
+// Para volver al rango corto basta con poner MES_COMPLETO en false:
+// entonces rige OPEN_FROM..OPEN_TO.
+export const MES_COMPLETO = true;
 export const OPEN_FROM = 1;
-export const OPEN_TO = 30;
+export const OPEN_TO = 5;
+
+/** Último día del mes de una fecha: 28, 29, 30 o 31. */
+export function ultimoDiaDelMes(fecha) {
+  return new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0).getDate();
+}
+
+/**
+ * Cómo se anuncia la ventana en pantalla.
+ * Con el mes completo no tiene sentido decir "del 1 al 31": se dice
+ * que está abierta todo el mes.
+ */
+export function textoVentana() {
+  return MES_COMPLETO ? "todo el mes" : `del ${OPEN_FROM} al ${OPEN_TO}`;
+}
 
 /** "Ahora" en hora de Bogotá, independiente de la zona horaria del equipo. */
 export function bogotaNow() {
@@ -64,6 +86,10 @@ export function getWindow() {
   const monthEnd = new Date(year, month + 1, 0);
   const day = today.getDate();
 
+  const lastDate = monthEnd.getDate();
+  const desde = OPEN_FROM;
+  const hasta = MES_COMPLETO ? lastDate : OPEN_TO;
+
   return {
     tz: TZ,
     today,
@@ -71,10 +97,12 @@ export function getWindow() {
     month,
     monthStart: new Date(year, month, 1),
     monthEnd,
-    lastDate: monthEnd.getDate(),
-    openFrom: OPEN_FROM,
-    openTo: OPEN_TO,
-    isOpenToday: day >= OPEN_FROM && day <= OPEN_TO,
-    isDayEnabled: (d) => d >= OPEN_FROM && d <= OPEN_TO,
+    lastDate,
+    mesCompleto: MES_COMPLETO,
+    openFrom: desde,
+    openTo: hasta,
+    texto: textoVentana(),
+    isOpenToday: day >= desde && day <= hasta,
+    isDayEnabled: (d) => d >= desde && d <= hasta,
   };
 }
