@@ -188,6 +188,73 @@ export default function AmigoGuia() {
 }
 
 /* ══════════════════════════════════════════════════════════════════
+   Globo de diálogo.
+
+   Se mide a sí mismo y luego busca dónde cabe entero: debajo, encima,
+   a la derecha o a la izquierda del elemento resaltado. Si nada cabe,
+   se queda donde menos estorbe, pero SIEMPRE recortado al viewport:
+   antes, con un elemento alto, el globo se iba fuera de la pantalla y
+   solo se veían los botones.
+   ══════════════════════════════════════════════════════════════════ */
+const M = 12;   // margen contra el borde de la pantalla
+const AIRE = 16; // separación respecto al elemento resaltado
+
+const acotar = (v, min, max) => Math.max(min, Math.min(v, max));
+
+function ubicar(caja, ancho, alto) {
+  const VW = window.innerWidth;
+  const VH = window.innerHeight;
+
+  if (VW < 640) return { left: M, right: M, bottom: M };
+
+  if (!caja) {
+    return {
+      left: acotar(VW / 2 - ancho / 2, M, VW - ancho - M),
+      top: acotar(VH / 2 - alto / 2, M, VH - alto - M),
+      width: ancho,
+    };
+  }
+
+  const centroX = caja.left + caja.width / 2 - ancho / 2;
+  const centroY = caja.top + caja.height / 2 - alto / 2;
+
+  const opciones = [
+    // debajo
+    {
+      top: caja.top + caja.height + AIRE,
+      left: centroX,
+      cabe: caja.top + caja.height + AIRE + alto + M <= VH,
+    },
+    // encima
+    {
+      top: caja.top - AIRE - alto,
+      left: centroX,
+      cabe: caja.top - AIRE - alto >= M,
+    },
+    // a la derecha
+    {
+      top: centroY,
+      left: caja.left + caja.width + AIRE,
+      cabe: caja.left + caja.width + AIRE + ancho + M <= VW,
+    },
+    // a la izquierda
+    {
+      top: centroY,
+      left: caja.left - AIRE - ancho,
+      cabe: caja.left - AIRE - ancho >= M,
+    },
+  ];
+
+  const elegida = opciones.find((o) => o.cabe) || opciones[0];
+
+  return {
+    top: acotar(elegida.top, M, Math.max(M, VH - alto - M)),
+    left: acotar(elegida.left, M, Math.max(M, VW - ancho - M)),
+    width: ancho,
+  };
+}
+
+/* ══════════════════════════════════════════════════════════════════
    Globo de diálogo. En móvil se ancla abajo; en escritorio se coloca
    junto al elemento resaltado, arriba o abajo según haya espacio.
    ══════════════════════════════════════════════════════════════════ */
@@ -202,33 +269,33 @@ function Globo({
   onCerrar,
   ref,
 }) {
-  const movil = typeof window !== "undefined" && window.innerWidth < 640;
+  const propio = useRef(null);
+  const [dim, setDim] = useState(null);
 
-  let estilo;
-  if (movil || !caja) {
-    estilo = movil
-      ? { left: 12, right: 12, bottom: 12 }
-      : {
-          left: "50%",
-          top: "50%",
-          transform: "translate(-50%, -50%)",
-          width: ANCHO_GLOBO,
-        };
-  } else {
-    const debajo = caja.top + caja.height + 16;
-    const cabeAbajo = debajo + 240 < window.innerHeight;
-    let left = caja.left + caja.width / 2 - ANCHO_GLOBO / 2;
-    left = Math.max(12, Math.min(left, window.innerWidth - ANCHO_GLOBO - 12));
-    estilo = cabeAbajo
-      ? { top: debajo, left, width: ANCHO_GLOBO }
-      : { bottom: window.innerHeight - caja.top + 16, left, width: ANCHO_GLOBO };
-  }
+  // Medir el globo ya renderizado para poder ubicarlo con su alto real
+  useLayoutEffect(() => {
+    const el = propio.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    setDim({ ancho: r.width, alto: r.height });
+  }, [paso, caja]);
+
+  const ancho = Math.min(ANCHO_GLOBO, window.innerWidth - M * 2);
+  const estilo = dim
+    ? ubicar(caja, ancho, dim.alto)
+    : { left: -9999, top: 0, width: ancho }; // primer render: fuera de vista
 
   return (
     <div
-      ref={ref}
+      ref={(n) => {
+        propio.current = n;
+        if (typeof ref === "function") ref(n);
+        else if (ref) ref.current = n;
+      }}
       tabIndex={-1}
-      className="absolute bg-white shadow-2xl border-t-4 border-ps-accent outline-none"
+      className={`absolute bg-white shadow-2xl border-t-4 border-ps-accent outline-none transition-opacity ${
+        dim ? "opacity-100" : "opacity-0"
+      }`}
       style={estilo}
     >
       <div className="p-5">
