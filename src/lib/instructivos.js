@@ -6,13 +6,13 @@
 // atributo download del enlace. Así el contratista recibe el archivo con el
 // código del sistema de gestión y la web no depende de caracteres especiales.
 //
-// Cada documento expone hasta dos formatos:
-//   - editable: el que se diligencia (DOCX / XLSX)
-//   - pdf:      versión de solo lectura, para consultar o imprimir
+// Cada documento expone un solo formato, el que de verdad se usa:
+//   - instructivos: PDF, porque se consultan, no se diligencian
+//   - plantillas:   el editable (DOCX / XLSX), que es el que se llena
 
 const BASE = "/documentos";
 
-/** Instructivos: guías del proceso. Se consultan, no se diligencian. */
+/** Instructivos: guías del proceso, en PDF. Se consultan, no se editan. */
 export const instructivos = [
   {
     id: "in-gf-001-radicacion",
@@ -20,7 +20,6 @@ export const instructivos = [
     titulo: "Instructivo para radicación de cuenta de cobro",
     descripcion: "Guía general del proceso. Aplica a todos los roles.",
     pdf: `${BASE}/instructivos/in-gf-001-radicacion-cuenta-cobro.pdf`,
-    editable: `${BASE}/instructivos/in-gf-001-radicacion-cuenta-cobro.docx`,
     nombreOficial: "IN-GF-001 INSTRUCTIVO PARA RADICACIÓN CUENTA DE COBRO v01",
   },
   {
@@ -29,7 +28,6 @@ export const instructivos = [
     titulo: "Instructivo cuenta de cobro — personal asistencial",
     descripcion: "Cómo diligenciar la cuenta de cobro del personal asistencial.",
     pdf: `${BASE}/instructivos/in-gf-001-cuenta-cobro-asistencial.pdf`,
-    editable: `${BASE}/instructivos/in-gf-001-cuenta-cobro-asistencial.docx`,
     nombreOficial: "IN-GF-001 INSTRUCTIVO CUENTA DE COBRO PERSONAL ASISTENCIAL v02",
   },
   {
@@ -38,7 +36,6 @@ export const instructivos = [
     titulo: "Instructivo cotización seguridad social independientes",
     descripcion: "Cómo liquidar y soportar los aportes a seguridad social.",
     pdf: `${BASE}/instructivos/in-gf-002-seguridad-social-independientes.pdf`,
-    editable: `${BASE}/instructivos/in-gf-002-seguridad-social-independientes.docx`,
     nombreOficial: "IN-GF-002 INSTRUCTIVO COTIZACION SEGURIDAD SOCIAL INDEPENDIENTES v01",
   },
   {
@@ -47,7 +44,6 @@ export const instructivos = [
     titulo: "Instructivo cuenta de cobro — conductores",
     descripcion: "Cómo diligenciar el formato de cuenta de cobro de conductores.",
     pdf: `${BASE}/instructivos/in-gf-003-cuenta-cobro-conductores.pdf`,
-    editable: `${BASE}/instructivos/in-gf-003-cuenta-cobro-conductores.docx`,
     nombreOficial:
       "IN-GF-003 INSTRUCTIVO PARA DILIGENCIAR EL FORMATO DE CUENTA DE COBRO CONDUCTORES V01",
   },
@@ -61,7 +57,6 @@ export const plantillas = {
       codigo: "FO-GF-005",
       titulo: "Plantilla cuenta de cobro asistencial",
       editable: `${BASE}/plantillas/fo-gf-005-cuenta-cobro-asistencial.docx`,
-      pdf: `${BASE}/plantillas/fo-gf-005-cuenta-cobro-asistencial.pdf`,
       nombreOficial: "FO-GF-005 PLANTILLA CUENTA DE COBRO ASISTENCIAL v01",
     },
     {
@@ -69,7 +64,6 @@ export const plantillas = {
       codigo: "FO-GF-003",
       titulo: "Plantilla relación de pacientes",
       editable: `${BASE}/plantillas/fo-gf-003-relacion-pacientes.xlsx`,
-      pdf: `${BASE}/plantillas/fo-gf-003-relacion-pacientes.pdf`,
       nombreOficial: "FO-GF-003 PLANTILLA RELACION DE PACIENTES v01",
     },
   ],
@@ -80,7 +74,6 @@ export const plantillas = {
       codigo: "FO-GF-006",
       titulo: "Plantilla cuenta de cobro administrativo",
       editable: `${BASE}/plantillas/fo-gf-006-cuenta-cobro-administrativo.docx`,
-      pdf: `${BASE}/plantillas/fo-gf-006-cuenta-cobro-administrativo.pdf`,
       nombreOficial: "FO-GF-006 PLANTILLA CUENTA DE COBRO ADMINISTRATIVO v01",
     },
     {
@@ -88,7 +81,6 @@ export const plantillas = {
       codigo: "FO-GF-001",
       titulo: "Informe de ejecución de actividades contractuales",
       editable: `${BASE}/plantillas/fo-gf-001-informe-ejecucion-actividades.docx`,
-      pdf: `${BASE}/plantillas/fo-gf-001-informe-ejecucion-actividades.pdf`,
       nombreOficial: "FO-GF-001 INFORME DE EJECUCIÓN DE ACTIVIDADES CONTRACTUALES v01",
     },
   ],
@@ -99,7 +91,6 @@ export const plantillas = {
       codigo: "FO-GF-002",
       titulo: "Plantilla cuenta de cobro conductores",
       editable: `${BASE}/plantillas/fo-gf-002-cuenta-cobro-conductores.docx`,
-      pdf: `${BASE}/plantillas/fo-gf-002-cuenta-cobro-conductores.pdf`,
       nombreOficial: "FO-GF-002 PLANTILLA CUENTA DE COBRO CONDUCTORES v01",
     },
     {
@@ -107,7 +98,6 @@ export const plantillas = {
       codigo: "FO-GF-004",
       titulo: "Relación de servicios — conductores",
       editable: `${BASE}/plantillas/fo-gf-004-relacion-servicios-conductores.xlsx`,
-      pdf: `${BASE}/plantillas/fo-gf-004-relacion-servicios-conductores.pdf`,
       nombreOficial: "FO-GF-004 RELACIÓN_DE_SERVICIOS-CONDUCTORES_v01",
     },
   ],

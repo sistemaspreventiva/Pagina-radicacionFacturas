@@ -82,7 +82,7 @@ export default function Instructivo() {
         <Encabezado
           numero="02"
           titulo="Formatos por rol"
-          descripcion="Descarga el archivo editable para diligenciarlo. El PDF es solo de consulta."
+          descripcion="Descarga el formato de tu rol y diligéncialo en tu computador."
         />
 
         <div data-guia="inst-roles" className="mt-10 grid md:grid-cols-3 gap-x-10 gap-y-12">
@@ -136,15 +136,16 @@ function Documento({ doc }) {
       )}
 
       <div className="mt-3 flex flex-wrap gap-2" data-guia="inst-formatos">
-        {doc.editable && <Descarga doc={doc} ruta={doc.editable} principal />}
-        {doc.pdf && <Descarga doc={doc} ruta={doc.pdf} />}
+        {/* cada documento tiene un solo formato: el instructivo en PDF,
+            la plantilla en editable */}
+        <Descarga doc={doc} ruta={doc.editable || doc.pdf} />
       </div>
     </li>
   );
 }
 
 /* Enlace de descarga. Conserva el nombre oficial del documento. */
-function Descarga({ doc, ruta, principal = false }) {
+function Descarga({ doc, ruta }) {
   const formato = formatoDe(ruta);
 
   return (
@@ -152,13 +153,9 @@ function Descarga({ doc, ruta, principal = false }) {
       href={ruta}
       download={nombreDescarga(doc, ruta)}
       title={`Descargar ${doc.nombreOficial}.${formato.toLowerCase()}`}
-      className={`inline-flex items-center gap-1.5 min-h-10 px-3 border text-xs font-semibold transition-colors ${
-        principal
-          ? "border-ps-blue text-ps-blue hover:bg-ps-blue hover:text-white"
-          : "border-ps-line text-ps-muted hover:border-ps-ink hover:text-ps-ink"
-      }`}
+      className="inline-flex items-center gap-1.5 min-h-10 px-3 border border-ps-blue text-ps-blue text-xs font-semibold transition-colors hover:bg-ps-blue hover:text-white"
     >
-      {formato}
+      Descargar {formato}
       <span aria-hidden="true">↓</span>
     </a>
   );

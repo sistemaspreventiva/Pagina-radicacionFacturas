@@ -142,9 +142,9 @@ export const RECORRIDOS = {
       },
       {
         objetivo: "inst-formatos",
-        titulo: "Editable o PDF",
+        titulo: "Un botón por documento",
         texto:
-          "Descarga DOCX o XLSX para diligenciarlo en tu computador. El PDF es solo para consultar cómo se ve.",
+          "Los instructivos se descargan en PDF, para leerlos. Las plantillas en Word o Excel, para que puedas diligenciarlas.",
       },
     ],
   },
