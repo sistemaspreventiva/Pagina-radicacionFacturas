@@ -220,3 +220,76 @@ a {
 @media (prefers-reduced-motion: reduce) {
   .halo-guia::before { animation: none; }
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   MASCOTA — animaciones
+   Las piezas se mueven con transform, y cada una necesita su propio
+   origen. transform-box: fill-box hace que el origen sea relativo a
+   la pieza y no al lienzo completo del SVG.
+   ══════════════════════════════════════════════════════════════════ */
+.mascota [class^="m-"] {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Respira: sube y baja despacio */
+@keyframes m-respira {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2.5px); }
+}
+.mascota .m-cuerpo { animation: m-respira 3.4s ease-in-out infinite; }
+
+/* Parpadeo: los parpados bajan un instante cada tanto */
+@keyframes m-parpadeo {
+  0%, 92%, 100% { transform: scaleY(0); }
+  95%, 97%      { transform: scaleY(1); }
+}
+.mascota .m-parpados {
+  transform-origin: top;
+  animation: m-parpadeo 4.6s ease-in-out infinite;
+}
+
+/* La cola se mueve de lado a lado */
+@keyframes m-cola {
+  0%, 100% { transform: rotate(-9deg); }
+  50%      { transform: rotate(9deg); }
+}
+.mascota .m-cola {
+  transform-origin: 20% 90%;
+  animation: m-cola 2.1s ease-in-out infinite;
+}
+
+/* Las orejas se sacuden de vez en cuando */
+@keyframes m-oreja {
+  0%, 70%, 100% { transform: rotate(0); }
+  76%           { transform: rotate(-11deg); }
+  82%           { transform: rotate(5deg); }
+  88%           { transform: rotate(0); }
+}
+.mascota .m-oreja-i { transform-origin: 70% 100%; animation: m-oreja 5.2s ease-in-out infinite; }
+.mascota .m-oreja-d { transform-origin: 30% 100%; animation: m-oreja 5.2s ease-in-out infinite 0.25s; }
+
+/* Saluda con la mano */
+@keyframes m-saludo {
+  0%, 60%, 100% { transform: rotate(0); }
+  70%           { transform: rotate(-24deg); }
+  80%           { transform: rotate(-6deg); }
+  90%           { transform: rotate(-24deg); }
+}
+.mascota .m-brazo { transform-origin: 80% 15%; animation: m-saludo 3.8s ease-in-out infinite; }
+
+/* El escudo destella */
+@keyframes m-brillo {
+  0%, 88%, 100% { opacity: 0; transform: translateX(-6px); }
+  93%           { opacity: 0.75; transform: translateX(6px); }
+}
+.mascota .m-brillo { animation: m-brillo 5.8s ease-in-out infinite; }
+
+/* Al pasar el cursor por el botón, la mascota se inclina */
+.halo-guia:hover .mascota,
+button:hover > .mascota { transform: rotate(-4deg) scale(1.05); }
+.mascota { transition: transform 0.25s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mascota [class^="m-"] { animation: none !important; }
+}
