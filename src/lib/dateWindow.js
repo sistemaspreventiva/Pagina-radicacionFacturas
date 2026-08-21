@@ -9,7 +9,7 @@ const TZ = "America/Bogota";
 //
 // Para volver al rango corto basta con poner MES_COMPLETO en false:
 // entonces rige OPEN_FROM..OPEN_TO.
-export const MES_COMPLETO = true;
+export const MES_COMPLETO = false;
 export const OPEN_FROM = 1;
 export const OPEN_TO = 5;
 
@@ -24,7 +24,9 @@ export function ultimoDiaDelMes(fecha) {
  * que está abierta todo el mes.
  */
 export function textoVentana() {
-  return MES_COMPLETO ? "todo el mes" : `del ${OPEN_FROM} al ${OPEN_TO}`;
+  return MES_COMPLETO
+    ? "todo el mes"
+    : `del ${OPEN_FROM} al ${OPEN_TO} de cada mes`;
 }
 
 /** "Ahora" en hora de Bogotá, independiente de la zona horaria del equipo. */
