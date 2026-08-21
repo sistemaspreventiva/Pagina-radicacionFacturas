@@ -3,7 +3,7 @@ const TZ = "America/Bogota";
 
 // Ventana de radicación: del 1 al 5 de cada mes, para TODOS los roles.
 export const OPEN_FROM = 1;
-export const OPEN_TO = 5;
+export const OPEN_TO = 30;
 
 /** "Ahora" en hora de Bogotá, independiente de la zona horaria del equipo. */
 export function bogotaNow() {
