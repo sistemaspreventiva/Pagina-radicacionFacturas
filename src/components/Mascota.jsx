@@ -19,7 +19,7 @@ const NARANJA = "#F0840C";
 const CREMA = "#FDF6EC";
 const SOMBRA = "#E8DFD0";
 
-export default function Mascota({ className = "w-12 h-12", animada = true }) {
+export default function Mascota({ className = "w-12 h-12", animada = true, style }) {
   const [falla, setFalla] = useState(false);
 
   if (!falla) {
@@ -28,6 +28,7 @@ export default function Mascota({ className = "w-12 h-12", animada = true }) {
         src={RUTA}
         alt=""
         className={`${className} object-contain`}
+        style={style}
         onError={() => setFalla(true)}
       />
     );
@@ -37,6 +38,7 @@ export default function Mascota({ className = "w-12 h-12", animada = true }) {
     <svg
       viewBox="0 0 100 100"
       className={`${className} ${animada ? "mascota" : ""}`}
+      style={style}
       role="img"
       aria-label="Tu guía"
     >
