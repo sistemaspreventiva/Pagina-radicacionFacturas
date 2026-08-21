@@ -323,15 +323,6 @@ button:hover > .mascota { transform: rotate(-4deg) scale(1.05); }
   .guia-mascota { animation: none; transform: var(--pos); opacity: 1; }
 }
 
-/* Puntitos que salen de la patita hacia lo señalado */
-@keyframes g-punto {
-  0%   { opacity: 0; transform: translate(0, 0) scale(0.5); }
-  35%  { opacity: 1; transform: translate(0, 0) scale(1); }
-  100% { opacity: 0; transform: var(--ida) scale(0.6); }
-}
-.guia-punto { animation: g-punto 1.3s ease-out infinite; }
-@media (prefers-reduced-motion: reduce) { .guia-punto { animation: none; opacity: 0.8; } }
-
 /* La patita estirada late suavemente hacia lo que señala */
 @keyframes g-patita {
   0%, 100% { transform: var(--giro, rotate(0deg)) translateX(0); }
