@@ -23,7 +23,7 @@ export const RECORRIDOS = {
         objetivo: "login-usuario",
         titulo: "Tu usuario",
         texto:
-          "Escribe el usuario y la contraseña que creaste al registrarte. Si aún no tienes cuenta, usa el enlace «Regístrate» de más abajo.",
+          "Escribe el usuario y la contraseña que creaste al registrarte. Si aún no tienes cuenta, usa el enlace «Regístrate»",
       },
       {
         objetivo: "login-ventana",
