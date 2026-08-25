@@ -26,7 +26,7 @@ patita hacia la zona resaltada.
 | `src/components/AmigoGuia.jsx` | El recorrido: foco, globo, colocación |
 | `src/components/Mascota.jsx` | La figura, con reemplazo SVG si falta el PNG |
 | `src/index.css` | Las animaciones (bloque `GUÍA — …`) |
-| `public/mascota-preventiva.png` | La mascota, 512×512 con transparencia |
+| `public/previ-busto.png` | Previ, 512×512 con transparencia |
 
 Se monta una sola vez, en `src/App.jsx`, dentro del `BrowserRouter`:
 
@@ -310,24 +310,32 @@ oscurece todo lo demás. Sale más barato que recortar una máscara:
 
 ## 7. La mascota
 
-`Mascota.jsx` intenta cargar `public/mascota-preventiva.png` y, si no
-existe, dibuja un personaje SVG de reemplazo. Así el componente nunca se
-ve roto y cambiar la figura es soltar el archivo.
+La mascota se llama **Previ** y vive en `public/previ-busto.png`.
+
+Es un recorte de medio cuerpo: cabeza, puño levantado, bata y carné. El
+cuerpo entero se descartó por dos razones — a 60px no se lee, y al ser
+tan vertical chocaba con la zona resaltada, lo que obligaba a Previ a
+replegarse dentro del globo casi siempre.
+
+Si el archivo no existe, `Mascota.jsx` dibuja un personaje SVG de
+reemplazo, así el componente nunca se ve roto y cambiar la figura es
+soltar el archivo.
 
 ```jsx
 const [falla, setFalla] = useState(false);
 
 if (!falla) {
-  return <img src="/mascota-preventiva.png" onError={() => setFalla(true)} … />;
+  return <img src="/previ-busto.png" onError={() => setFalla(true)} … />;
 }
 return <svg …>{/* personaje de reemplazo */}</svg>;
 ```
 
 ### Preparar la imagen
 
-La imagen original venía con fondo naranja y azul sin transparencia.
-Recortar por color plano se comía el pelaje difuso, así que el recorte se
-hace por **inundación desde los bordes con transparencia gradual**:
+Previ llegó sobre fondo blanco liso, y su bata TAMBIÉN es blanca: borrar
+por color se la habría comido. El recorte se hace por **inundación desde
+los bordes**, que solo avanza por lo contiguo y se detiene en el
+contorno:
 
 1. Inundar desde el borde, aceptando lo que se parezca al fondo. Como
    avanza solo por lo contiguo, los turquesas interiores (escudo, ojos)

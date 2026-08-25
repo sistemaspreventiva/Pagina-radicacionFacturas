@@ -116,7 +116,7 @@ export default function AmigoGuia() {
         <div className="fixed bottom-5 right-5 z-[70] flex items-center gap-3">
           {saluda && (
             <p className="hidden sm:block bg-ps-navy text-white text-sm px-3 py-2 shadow-lg">
-              ¿Te muestro cómo funciona?
+              Soy Previ, ¿te muestro cómo funciona?
             </p>
           )}
           <button
@@ -124,8 +124,8 @@ export default function AmigoGuia() {
             className={`relative isolate grid place-items-center w-16 h-16 rounded-full bg-white border-2 border-ps-blue shadow-lg hover:scale-105 transition-transform ${
               saluda ? "halo-guia" : ""
             }`}
-            aria-label="Abrir la guía"
-            title="¿Necesitas ayuda?"
+            aria-label="Abrir la guía de Previ"
+            title="Previ · ¿necesitas ayuda?"
           >
             <Mascota className="w-16 h-16" />
             <span className="absolute -top-1 -right-1 grid place-items-center w-6 h-6 rounded-full bg-ps-accent text-white text-xs font-bold">
@@ -165,7 +165,7 @@ export default function AmigoGuia() {
             className="absolute inset-0 w-full h-full cursor-default"
             onClick={cerrar}
             tabIndex={-1}
-            aria-label="Cerrar la guía"
+            aria-label="Cerrar la guía de Previ"
           />
 
           <Globo

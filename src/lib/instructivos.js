@@ -23,14 +23,6 @@ export const instructivos = [
     nombreOficial: "IN-GF-001 INSTRUCTIVO PARA RADICACIÓN CUENTA DE COBRO v01",
   },
   {
-    id: "in-gf-001-asistencial",
-    codigo: "IN-GF-001",
-    titulo: "Instructivo cuenta de cobro — personal asistencial",
-    descripcion: "Cómo diligenciar la cuenta de cobro del personal asistencial.",
-    pdf: `${BASE}/instructivos/in-gf-001-cuenta-cobro-asistencial.pdf`,
-    nombreOficial: "IN-GF-001 INSTRUCTIVO CUENTA DE COBRO PERSONAL ASISTENCIAL v02",
-  },
-  {
     id: "in-gf-002-seguridad-social",
     codigo: "IN-GF-002",
     titulo: "Instructivo cotización seguridad social independientes",
@@ -46,6 +38,14 @@ export const instructivos = [
     pdf: `${BASE}/instructivos/in-gf-003-cuenta-cobro-conductores.pdf`,
     nombreOficial:
       "IN-GF-003 INSTRUCTIVO PARA DILIGENCIAR EL FORMATO DE CUENTA DE COBRO CONDUCTORES V01",
+  },
+  {
+    id: "in-gf-004-asistencial",
+    codigo: "IN-GF-004",
+    titulo: "Instructivo cuenta de cobro — personal asistencial",
+    descripcion: "Cómo diligenciar la cuenta de cobro del personal asistencial.",
+    pdf: `${BASE}/instructivos/in-gf-004-cuenta-cobro-asistencial.pdf`,
+    nombreOficial: "IN-GF-004 INSTRUCTIVO CUENTA DE COBRO PERSONAL ASISTENCIAL v01",
   },
 ];
 

@@ -1,16 +1,17 @@
 // src/components/Mascota.jsx
 //
-// Para usar la mascota oficial, deja el archivo en:
-//     public/mascota-preventiva.png
-// (fondo transparente, cuadrada, idealmente 512x512)
+// Previ, la mascota de Preventiva Salud IPS.
 //
-// Se toma sola. Mientras no exista, se dibuja el cachorro de abajo,
-// hecho con los colores del logo. Las animaciones (respirar, parpadear,
-// mover la cola y las orejas, saludar) viven en index.css bajo .mascota
-// y se desactivan solas si el sistema pide menos movimiento.
+// Se usa el recorte de medio cuerpo (cabeza, puño levantado, bata y
+// carné). El cuerpo entero se descartó por dos razones: a 60px no se
+// lee, y al ser tan vertical chocaba con la zona resaltada y obligaba a
+// Previ a replegarse dentro del globo casi siempre.
+//
+// Si el archivo no existe se dibuja el personaje SVG de reemplazo, así
+// el componente nunca se ve roto.
 import { useState } from "react";
 
-const RUTA = "/mascota-preventiva.png";
+const PREVI = "/previ-busto.png";
 
 const NAVY = "#002460";
 const AZUL = "#00489C";
@@ -25,7 +26,7 @@ export default function Mascota({ className = "w-12 h-12", animada = true, style
   if (!falla) {
     return (
       <img
-        src={RUTA}
+        src={PREVI}
         alt=""
         className={`${className} object-contain`}
         style={style}
@@ -40,7 +41,7 @@ export default function Mascota({ className = "w-12 h-12", animada = true, style
       className={`${className} ${animada ? "mascota" : ""}`}
       style={style}
       role="img"
-      aria-label="Tu guía"
+      aria-label="Previ, tu guía"
     >
       <defs>
         <clipPath id="m-escudo">

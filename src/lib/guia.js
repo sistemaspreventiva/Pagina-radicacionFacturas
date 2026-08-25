@@ -15,9 +15,9 @@ export const RECORRIDOS = {
     pasos: [
       {
         objetivo: null, // sin objetivo: tarjeta de bienvenida centrada
-        titulo: "¡Hola! Soy tu guía",
+        titulo: "¡Hola! Me llamo Previ",
         texto:
-          "Te muestro en menos de un minuto cómo radicar tu cuenta de cobro. Puedes cerrarme cuando quieras y volver a abrirme con el botón de abajo.",
+          "Soy la mascota de Preventiva y te acompaño. En menos de un minuto te muestro cómo radicar tu cuenta de cobro. Puedes cerrarme cuando quieras y volver a llamarme con el botón de abajo.",
       },
       {
         objetivo: "login-usuario",
@@ -67,7 +67,7 @@ export const RECORRIDOS = {
     pasos: [
       {
         objetivo: null,
-        titulo: "Te acompaño en el envío",
+        titulo: "Previ te acompaña en el envío",
         texto:
           "Radicar son cuatro datos: el periodo, el valor, los archivos y enviar. Vamos uno por uno.",
       },
