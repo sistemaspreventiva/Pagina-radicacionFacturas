@@ -9,8 +9,8 @@ hay que tener en cuenta para tocarlo o llevarlo a otro proyecto.
 
 Un botón flotante abre un recorrido paso a paso. Cada paso oscurece la
 pantalla, deja iluminada solo la zona de la que habla y muestra un globo
-con la explicación. La mascota se planta al lado del globo y estira su
-patita hacia la zona resaltada.
+con la explicación. Previ se planta al lado del globo, mirando hacia la
+zona resaltada.
 
 - La primera visita a cada pantalla ofrece la guía con un halo que late.
   Una vez vista, no vuelve a insistir (queda en `localStorage` por ruta).
@@ -82,8 +82,8 @@ export const RECORRIDOS = {
 
 ## 3. Las animaciones
 
-Van en `src/index.css`. Son cuatro y todas se desactivan si el sistema
-pide menos movimiento.
+Van en `src/index.css`. Son dos, entrada y flotación, y ambas se
+desactivan si el sistema pide menos movimiento.
 
 ```css
 /* Entra dando un saltito */
@@ -107,39 +107,27 @@ pide menos movimiento.
              g-flota 3s ease-in-out 0.45s infinite;
 }
 
-/* La patita estirada late suavemente hacia lo que señala */
-@keyframes g-patita {
-  0%, 100% { transform: var(--giro, rotate(0deg)) translateX(0); }
-  50%      { transform: var(--giro, rotate(0deg)) translateX(5px); }
-}
-.guia-patita {
-  transform: var(--giro, rotate(0deg));
-  transform-origin: 25% 50%;
-  animation: g-patita 1.2s ease-in-out infinite;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .guia-mascota { animation: none; transform: var(--pos); opacity: 1; }
-  .guia-patita  { animation: none; }
 }
 ```
 
 ### El detalle que cuesta descubrir
 
 Las keyframes usan `transform`, y la posición y el giro también. Si se
-ponen ambos, **la animación gana y borra la colocación**: la mascota
-aparece en la esquina superior izquierda y la patita sin girar.
+ponen ambos, **la animación gana y borra la colocación**: la figura
+aparece en la esquina superior izquierda.
 
 La solución es pasar la parte fija en una variable CSS que las keyframes
-componen. Por eso `g-entra` empieza por `var(--pos)` y `g-patita` por
-`var(--giro)`, y desde React se envía la variable, nunca `transform`:
+componen. Por eso `g-entra` y `g-flota` empiezan por `var(--pos)`, y
+desde React se envía la variable, nunca `transform`:
 
 ```jsx
 // mal: la animación lo pisa
-<PatitaSenala style={{ transform: "scaleX(-1)" }} />
+<div className="guia-mascota" style={{ transform: "translate(-108%, -50%)" }} />
 
 // bien: la animación lo compone
-<PatitaSenala style={{ "--giro": "scaleX(-1)" }} />
+<div className="guia-mascota" style={{ "--pos": "translate(-108%, -50%)" }} />
 ```
 
 ---
@@ -209,7 +197,9 @@ const estilo = ubicacion?.estilo ?? { left: -9999, top: 0, width: ancho };
 ## 5. Dónde se planta la mascota
 
 Una sola regla, y por eso siempre es coherente: **se planta a un lado del
-globo, se voltea para mirar hacia él y estira la patita en esa dirección.**
+globo y se voltea para mirar hacia él**, con su puño levantado del lado
+del elemento que se explica. No se le dibuja ninguna patita aparte: se
+intentó y quedaba como una pieza suelta que no concordaba con el cuerpo.
 
 ```jsx
 const aLaIzquierda = lado === "derecha" ? alterno : !alterno;
@@ -228,21 +218,13 @@ const posicion = aLaIzquierda
     className="relative w-full h-full drop-shadow-2xl"
     style={aLaIzquierda ? { transform: "scaleX(-1)" } : undefined}
   />
-  {/* la patita sale del brazo levantado, que tras el volteo queda
-      siempre del lado del globo */}
-  <PatitaSenala
-    style={{
-      top: "20%",
-      ...(aLaIzquierda ? { right: "-20%" } : { left: "-20%" }),
-      "--giro": aLaIzquierda ? "rotate(0deg)" : "scaleX(-1)",
-    }}
-  />
 </div>
 ```
 
-La patita se dibuja **anclada a la punta del brazo levantado de la
-figura**, no flotando aparte. Ese fue el error de los primeros intentos:
-una patita suelta al lado se lee como un bulto, no como un gesto.
+Se probó a dibujarle una patita señalando, primero suelta al lado y
+después anclada al brazo levantado. En ambos casos se leía como una
+pieza pegada, así que se descartó: la figura ya tiene su propio puño
+levantado y ese gesto basta.
 
 ### Cuando no cabe
 
@@ -357,7 +339,7 @@ mascota basta con cambiar los colores de fondo y volver a ejecutarlo.
 
 - PNG cuadrado, idealmente 512×512, con transparencia
 - La figura de pie y de frente
-- **Con un brazo levantado**: de ahí sale la patita que señala
+- **Con un brazo levantado**: es el gesto con el que Previ señala
 - Si el brazo levantado está a la derecha en vez de a la izquierda, hay
   que invertir la condición `aLaIzquierda` del volteo
 
@@ -370,7 +352,7 @@ no a ojo. El recorrido completo son 160 pasos: 4 pantallas × 8 anchos.
 Por cada paso se verifica que:
 
 - el globo esté entero dentro del viewport
-- la mascota y la patita estén enteras dentro del viewport
+- la figura esté entera dentro del viewport
 - la mascota no se solape con la zona resaltada
 - no haya desborde horizontal
 - no haya errores de consola
@@ -399,7 +381,6 @@ Por si se vuelve a tocar:
 | Síntoma | Causa |
 |---|---|
 | La mascota aparece arriba a la izquierda | `transform` en línea pisado por las keyframes; usar `var(--pos)` |
-| La patita no gira | Lo mismo con `var(--giro)` |
 | La figura se sube encima del texto | El posicionamiento puesto en un div interior en vez de en `.guia-mascota` |
 | Nunca se repliega aunque estorbe | La decisión dependía de `caja`, que cambia en cada scroll |
 | Se sale de pantalla a 768px | El margen horizontal era menor que los 173px que se desplaza |

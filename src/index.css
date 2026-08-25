@@ -323,14 +323,3 @@ button:hover > .mascota { transform: rotate(-4deg) scale(1.05); }
   .guia-mascota { animation: none; transform: var(--pos); opacity: 1; }
 }
 
-/* La patita estirada late suavemente hacia lo que señala */
-@keyframes g-patita {
-  0%, 100% { transform: var(--giro, rotate(0deg)) translateX(0); }
-  50%      { transform: var(--giro, rotate(0deg)) translateX(5px); }
-}
-.guia-patita {
-  transform: var(--giro, rotate(0deg));
-  transform-origin: 25% 50%;
-  animation: g-patita 1.2s ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) { .guia-patita { animation: none; } }

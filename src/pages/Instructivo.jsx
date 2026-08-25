@@ -15,16 +15,15 @@ const ROLES = [
 
 export default function Instructivo() {
   return (
-    <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 md:pt-24 pb-8">
-      {/* ── Titular ─────────────────────────────────────────────── */}
-      <div className="max-w-2xl">
+    <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-14 md:pt-20 pb-8">
+      {/* ── Titular: centrado y a todo el ancho ─────────────────── */}
+      <div className="text-center">
         <p className="eyebrow">Documentos</p>
-        <h1 className="mt-5 text-title md:text-display font-semibold text-ps-navy">
-          Instructivos
-          <br />y formatos
+        <h1 className="mt-4 text-title md:text-[3.25rem] md:leading-[1.05] md:tracking-[-0.03em] font-semibold text-ps-navy">
+          Instructivos y formatos
         </h1>
         <div
-          className="cintillo mt-8 flex items-baseline gap-3"
+          className="cintillo mt-8 inline-flex items-baseline gap-3 text-left"
           style={{ "--borde": "var(--color-ps-teal)", "--fondo": "var(--color-ps-teal-50)" }}
         >
           <span className="tick translate-y-0.5" aria-hidden="true" />

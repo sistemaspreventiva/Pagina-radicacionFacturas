@@ -337,9 +337,9 @@ function Senalador({ lado, caja, onNoCabe }) {
 
   const aLaIzquierda = lado === "derecha" ? alterno : !alterno;
 
-  // Regla única y siempre coherente: la mascota se planta a un lado del
-  // globo, se voltea para MIRAR hacia él y estira la patita en esa misma
-  // dirección. Así el gesto nunca apunta hacia su propio cuerpo.
+  // Regla única y siempre coherente: Previ se planta a un lado del globo
+  // y se voltea para MIRAR hacia él, con su puño levantado del lado del
+  // elemento que se está explicando.
   // Previ de pie es alto (unas 2,2 veces su ancho). Centrarlo sobre el
   // globo le metia la cabeza en la zona resaltada cuando esta queda justo
   // encima, y acababa replegandose. Se ancla al borde del globo que se
@@ -377,88 +377,7 @@ function Senalador({ lado, caja, onNoCabe }) {
         style={aLaIzquierda ? { transform: "scaleX(-1)" } : undefined}
       />
 
-      {/* la patita sale del brazo levantado, que tras el volteo queda
-          siempre del lado del globo */}
-      <PatitaSenala
-        style={{
-          top: "26%",
-          ...(aLaIzquierda ? { right: "-26%" } : { left: "-26%" }),
-          "--giro": aLaIzquierda ? "rotate(0deg)" : "scaleX(-1)",
-        }}
-      />
     </div>
-  );
-}
-
-/* Patita señalando: puñito cerrado con UN dedito estirado.
-   Se traza como una sola silueta (muñeca, lomo del puño, dedito, yema,
-   nudillos y base) para que el dedo no parezca una pieza pegada.
-   El dedito nace del BORDE SUPERIOR: si sale del centro parece otro
-   dedo, que no es la idea. Apunta a la derecha en su orientación
-   natural; se gira o se espeja según haga falta. */
-function PatitaSenala({ style }) {
-  const FUR = "#FFFFFF";
-  const BORDE = "#9EAEC0";
-  const BEAN = "#F6C3A9";
-  const BEAN_B = "#DE9A7C";
-
-  return (
-    <svg
-      viewBox="0 0 48 48"
-      className="guia-patita absolute w-12 h-12 sm:w-14 sm:h-14 drop-shadow-lg"
-      style={style}
-      aria-hidden="true"
-    >
-      {/* muñequera turquesa, como la de Previ */}
-      <rect x="0" y="19" width="12" height="17" rx="6" fill="#009CB4" />
-      <rect x="8.5" y="20.5" width="4" height="14" rx="2" fill="#00808F" />
-
-      {/* silueta completa */}
-      <path
-        d="M9 20
-           Q10 14.5 18 13.6
-           L26.5 13.2
-           L38.5 12.4
-           A4.6 4.6 0 0 1 38.5 21.6
-           L27.6 21.2
-           Q26.3 23.4 26.6 26
-           Q27.4 31.4 24 34.8
-           Q18.8 38.6 13.4 36.4
-           Q9.6 34.6 9 30.6
-           Z"
-        fill={FUR}
-        stroke={BORDE}
-        strokeWidth="1.9"
-        strokeLinejoin="round"
-      />
-
-      {/* yema del dedito */}
-      <ellipse cx="35.6" cy="17" rx="2.9" ry="3.2" fill={BEAN} />
-      <ellipse cx="35.6" cy="17.9" rx="1.9" ry="1.9" fill={BEAN_B} opacity="0.4" />
-
-      {/* nudillos de los deditos recogidos */}
-      <path
-        d="M17 25.4 q5.4-1.2 8.2 0.8 M16.4 30.6 q5.2-1.2 8 0.6"
-        stroke={BORDE}
-        strokeWidth="1.5"
-        fill="none"
-        strokeLinecap="round"
-        opacity="0.7"
-      />
-
-      {/* pulgar, apoyado delante del puño */}
-      <path
-        d="M14.6 28.4
-           q4.6-1.4 7.4 1
-           q2.2 1.9-0.8 3.6
-           q-3.4 1.9-6.8-0.8 Z"
-        fill={FUR}
-        stroke={BORDE}
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-      <ellipse cx="18" cy="30.4" rx="2.1" ry="1.7" fill={BEAN} opacity="0.9" />
-    </svg>
   );
 }
 
