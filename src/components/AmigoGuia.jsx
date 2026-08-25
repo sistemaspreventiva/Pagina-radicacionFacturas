@@ -127,7 +127,7 @@ export default function AmigoGuia() {
             aria-label="Abrir la guía de Previ"
             title="Previ · ¿necesitas ayuda?"
           >
-            <Mascota className="w-16 h-16" />
+            <Mascota className="w-16 h-16" busto />
             <span className="absolute -top-1 -right-1 grid place-items-center w-6 h-6 rounded-full bg-ps-accent text-white text-xs font-bold">
               ?
             </span>
@@ -196,23 +196,36 @@ export default function AmigoGuia() {
    antes, con un elemento alto, el globo se iba fuera de la pantalla y
    solo se veían los botones.
    ══════════════════════════════════════════════════════════════════ */
-// La mascota sobresale por los lados, no por arriba ni por abajo,
-// asi que el margen horizontal es grande y el vertical no.
-// La mascota mide 160px y se desplaza un 108%, o sea 173px fuera del
-// globo: el margen horizontal tiene que superar esa cifra.
-const M_H = 192;
-const M_V = 12;
+// Previ sobresale por los lados, no por arriba ni por abajo, asi que el
+// margen horizontal es grande y el vertical no. De pie mide 112px de
+// ancho y se desplaza un 108%: 121px fuera del globo, mas la patita.
+const M_H = 168;
+// Previ de pie mide mas que el globo y se empuja un 20% hacia afuera,
+// asi que sobresale unos 50px por arriba o por abajo. Sin este margen
+// se salia de pantalla en monitores bajos (1366x650).
+const M_V = 60;
 const AIRE = 16; // separación respecto al elemento resaltado
 
 const acotar = (v, min, max) => Math.max(min, Math.min(v, max));
 
-/** ¿Queda sitio libre a algún lado del elemento para plantar la mascota? */
-function hayHueco(caja) {
-  const ANCHO_MASCOTA = 176; // 160px + aire
-  return (
-    caja.left >= ANCHO_MASCOTA ||
-    window.innerWidth - (caja.left + caja.width) >= ANCHO_MASCOTA
-  );
+const ANCHO_MASCOTA = 150; // 112px de figura + la patita + aire
+
+/**
+ * ¿Queda sitio para plantar a Previ sin que se monte sobre el elemento?
+ *
+ * Ojo: no basta con mirar los bordes de la pantalla. Previ se coloca
+ * junto al GLOBO, y cuando el globo va arriba o abajo queda centrado
+ * sobre el elemento; si el elemento es ancho (una rejilla de tarjetas),
+ * Previ aterriza dentro de él por muy grande que sea la pantalla.
+ */
+function hayHueco(caja, lado) {
+  if (lado === "derecha" || lado === "izquierda") {
+    // el globo va al lado del elemento, así que Previ queda por fuera
+    return true;
+  }
+  // el globo va centrado sobre el elemento: Previ tiene que sobresalir
+  const alcance = ANCHO_GLOBO / 2 + ANCHO_MASCOTA;
+  return alcance > caja.width / 2;
 }
 
 function ubicar(caja, ancho, alto) {
@@ -308,9 +321,12 @@ function Senalador({ lado, caja, onNoCabe }) {
     const el = ref.current;
     if (!el || !caja) return;
     const b = el.getBoundingClientRect();
+    // Se exige un solape real: un roce de pocos pixeles no molesta y
+    // antes bastaba para hacerla replegarse.
+    const ROCE = 14;
     const choca =
-      b.right > caja.left && b.left < caja.left + caja.width &&
-      b.bottom > caja.top && b.top < caja.top + caja.height;
+      b.right - ROCE > caja.left && b.left + ROCE < caja.left + caja.width &&
+      b.bottom - ROCE > caja.top && b.top + ROCE < caja.top + caja.height;
     if (!choca) return;
     // primero el otro lado; si tampoco cabe, se repliega dentro del globo
     if (!alterno) setAlterno(true);
@@ -324,24 +340,40 @@ function Senalador({ lado, caja, onNoCabe }) {
   // Regla única y siempre coherente: la mascota se planta a un lado del
   // globo, se voltea para MIRAR hacia él y estira la patita en esa misma
   // dirección. Así el gesto nunca apunta hacia su propio cuerpo.
+  // Previ de pie es alto (unas 2,2 veces su ancho). Centrarlo sobre el
+  // globo le metia la cabeza en la zona resaltada cuando esta queda justo
+  // encima, y acababa replegandose. Se ancla al borde del globo que se
+  // ALEJA del elemento: si el elemento esta arriba, Previ se apoya en el
+  // borde de abajo y crece hacia abajo.
+  // Ademas del anclaje hace falta empujarla hacia afuera: Previ es mas
+  // alto que el globo, asi que apoyado en el borde de abajo todavia le
+  // sobresale la cabeza por arriba, justo donde esta el elemento.
+  const anclaje =
+    lado === "abajo"
+      ? { bottom: 0, desplazaY: "20%" }
+      : lado === "arriba"
+      ? { top: 0, desplazaY: "-20%" }
+      : { top: "50%", desplazaY: "-50%" };
+
+  const { desplazaY, ...bordeY } = anclaje;
   const posicion = aLaIzquierda
-    ? { left: 0, top: "50%", "--pos": `translate(-108%, -50%) rotate(${c.giro}deg)` }
-    : { right: 0, top: "50%", "--pos": `translate(108%, -50%) rotate(${-c.giro}deg)` };
+    ? { left: 0, ...bordeY, "--pos": `translate(-108%, ${desplazaY}) rotate(${c.giro}deg)` }
+    : { right: 0, ...bordeY, "--pos": `translate(108%, ${desplazaY}) rotate(${-c.giro}deg)` };
 
   return (
     <div
       ref={ref}
-      className="guia-mascota w-32 h-32 sm:w-40 sm:h-40"
+      className="guia-mascota w-24 sm:w-28"
       style={posicion}
     >
       {/* halo: la mascota es casi blanca y sin esto se deslavaba */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 rounded-full blur-xl"
+        className="absolute inset-x-[-15%] inset-y-[8%] rounded-[50%] blur-xl"
         style={{ background: "radial-gradient(closest-side, rgba(255,255,255,0.95), rgba(255,255,255,0))" }}
       />
       <Mascota
-        className="relative w-full h-full drop-shadow-2xl"
+        className="relative w-full h-auto drop-shadow-2xl"
         style={aLaIzquierda ? { transform: "scaleX(-1)" } : undefined}
       />
 
@@ -349,8 +381,8 @@ function Senalador({ lado, caja, onNoCabe }) {
           siempre del lado del globo */}
       <PatitaSenala
         style={{
-          top: "20%",
-          ...(aLaIzquierda ? { right: "-20%" } : { left: "-20%" }),
+          top: "26%",
+          ...(aLaIzquierda ? { right: "-26%" } : { left: "-26%" }),
           "--giro": aLaIzquierda ? "rotate(0deg)" : "scaleX(-1)",
         }}
       />
@@ -358,11 +390,15 @@ function Senalador({ lado, caja, onNoCabe }) {
   );
 }
 
-/* Patita del leopardito señalando: puñito y dedito extendido en una
-   sola silueta. En su orientación natural apunta a la derecha. */
+/* Patita señalando: puñito cerrado con UN dedito estirado.
+   Se traza como una sola silueta (muñeca, lomo del puño, dedito, yema,
+   nudillos y base) para que el dedo no parezca una pieza pegada.
+   El dedito nace del BORDE SUPERIOR: si sale del centro parece otro
+   dedo, que no es la idea. Apunta a la derecha en su orientación
+   natural; se gira o se espeja según haga falta. */
 function PatitaSenala({ style }) {
   const FUR = "#FFFFFF";
-  const BORDE = "#9FB0C2";
+  const BORDE = "#9EAEC0";
   const BEAN = "#F6C3A9";
   const BEAN_B = "#DE9A7C";
 
@@ -373,20 +409,22 @@ function PatitaSenala({ style }) {
       style={style}
       aria-hidden="true"
     >
-      {/* muñequera turquesa, como la de la mascota */}
-      <rect x="0" y="15" width="12" height="19" rx="6" fill="#009CB4" />
-      <rect x="8.5" y="16.5" width="4" height="16" rx="2" fill="#00808F" />
+      {/* muñequera turquesa, como la de Previ */}
+      <rect x="0" y="19" width="12" height="17" rx="6" fill="#009CB4" />
+      <rect x="8.5" y="20.5" width="4" height="14" rx="2" fill="#00808F" />
 
-      {/* silueta: puño y dedito de un solo trazo */}
+      {/* silueta completa */}
       <path
-        d="M9 13.5
-           q7-3.6 13.4 0.4
-           q4.2 2.6 5.6 5.6
-           h10.4
-           a4.9 4.9 0 0 1 0 9.8
-           H28
-           q-1.3 3.5-5.6 6.1
-           q-6.4 3.8-13.4 0.4
+        d="M9 20
+           Q10 14.5 18 13.6
+           L26.5 13.2
+           L38.5 12.4
+           A4.6 4.6 0 0 1 38.5 21.6
+           L27.6 21.2
+           Q26.3 23.4 26.6 26
+           Q27.4 31.4 24 34.8
+           Q18.8 38.6 13.4 36.4
+           Q9.6 34.6 9 30.6
            Z"
         fill={FUR}
         stroke={BORDE}
@@ -394,16 +432,32 @@ function PatitaSenala({ style }) {
         strokeLinejoin="round"
       />
 
-      <ellipse cx="36.4" cy="24.3" rx="3.1" ry="3.4" fill={BEAN} />
-      <ellipse cx="14.6" cy="18.6" rx="2.6" ry="2.9" fill={BEAN} />
-      <ellipse cx="20.4" cy="16.9" rx="2.6" ry="2.9" fill={BEAN} />
+      {/* yema del dedito */}
+      <ellipse cx="35.6" cy="17" rx="2.9" ry="3.2" fill={BEAN} />
+      <ellipse cx="35.6" cy="17.9" rx="1.9" ry="1.9" fill={BEAN_B} opacity="0.4" />
+
+      {/* nudillos de los deditos recogidos */}
       <path
-        d="M17.5 24.4 q5.6-0.6 6.8 3.4 q1.2 4.2-3.2 5.8
-           q-4.6 1.6-7.4-1.1 q-2.4-2.4-0.5-5.4 q1.5-2.3 4.3-2.7 Z"
-        fill={BEAN}
+        d="M17 25.4 q5.4-1.2 8.2 0.8 M16.4 30.6 q5.2-1.2 8 0.6"
+        stroke={BORDE}
+        strokeWidth="1.5"
+        fill="none"
+        strokeLinecap="round"
+        opacity="0.7"
       />
-      <path d="M18.2 27 q3.4 0.2 4 2.6" stroke={BEAN_B} strokeWidth="1.3"
-            fill="none" strokeLinecap="round" opacity="0.55" />
+
+      {/* pulgar, apoyado delante del puño */}
+      <path
+        d="M14.6 28.4
+           q4.6-1.4 7.4 1
+           q2.2 1.9-0.8 3.6
+           q-3.4 1.9-6.8-0.8 Z"
+        fill={FUR}
+        stroke={BORDE}
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <ellipse cx="18" cy="30.4" rx="2.1" ry="1.7" fill={BEAN} opacity="0.9" />
     </svg>
   );
 }
@@ -459,7 +513,7 @@ function Globo({
     >
       {/* Si el elemento resaltado ocupa casi todo el ancho no queda hueco
           libre a ningún lado, así que la mascota va dentro del globo. */}
-      {dim && caja && !movil && !sinSitio && hayHueco(caja) && (
+      {dim && caja && !movil && !sinSitio && hayHueco(caja, ubicacion.lado) && (
         <Senalador
           lado={ubicacion.lado}
           caja={caja}
@@ -470,8 +524,8 @@ function Globo({
       <div className="p-5">
         <div className="flex items-start gap-3">
           {/* En móvil la mascota va aquí dentro: fuera taparía el campo */}
-          {(movil || sinSitio || !caja || !hayHueco(caja)) && (
-            <Mascota className="w-14 h-14 shrink-0 -mt-1" />
+          {(movil || sinSitio || !caja || !hayHueco(caja, ubicacion?.lado)) && (
+            <Mascota className="w-14 h-14 shrink-0 -mt-1" busto />
           )}
           <div className="min-w-0">
             <h3 className="text-section font-semibold text-ps-navy">

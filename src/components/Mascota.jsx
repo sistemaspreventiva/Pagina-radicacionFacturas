@@ -2,16 +2,17 @@
 //
 // Previ, la mascota de Preventiva Salud IPS.
 //
-// Se usa el recorte de medio cuerpo (cabeza, puño levantado, bata y
-// carné). El cuerpo entero se descartó por dos razones: a 60px no se
-// lee, y al ser tan vertical chocaba con la zona resaltada y obligaba a
-// Previ a replegarse dentro del globo casi siempre.
+// Dos versiones del mismo personaje:
+//   public/previ-cuerpo.png  de pie, para la figura grande de la guía
+//   public/previ-busto.png   medio cuerpo, porque de cuerpo entero a
+//                            60px la cara no se distingue
 //
-// Si el archivo no existe se dibuja el personaje SVG de reemplazo, así
-// el componente nunca se ve roto.
+// Se pide con <Mascota busto />. Si el archivo no existe se dibuja el
+// personaje SVG de reemplazo, así el componente nunca se ve roto.
 import { useState } from "react";
 
-const PREVI = "/previ-busto.png";
+const CUERPO = "/previ-cuerpo.png";
+const BUSTO = "/previ-busto.png";
 
 const NAVY = "#002460";
 const AZUL = "#00489C";
@@ -20,13 +21,18 @@ const NARANJA = "#F0840C";
 const CREMA = "#FDF6EC";
 const SOMBRA = "#E8DFD0";
 
-export default function Mascota({ className = "w-12 h-12", animada = true, style }) {
+export default function Mascota({
+  className = "w-12 h-12",
+  animada = true,
+  busto = false,
+  style,
+}) {
   const [falla, setFalla] = useState(false);
 
   if (!falla) {
     return (
       <img
-        src={PREVI}
+        src={busto ? BUSTO : CUERPO}
         alt=""
         className={`${className} object-contain`}
         style={style}

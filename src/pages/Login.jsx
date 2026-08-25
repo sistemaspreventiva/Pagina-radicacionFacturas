@@ -116,8 +116,8 @@ export default function Login() {
               </>
             ) : (
               <>
-                <p className="mt-2 text-5xl font-semibold tracking-tight text-ps-navy">
-                  {OPEN_FROM} <span className="text-ps-teal">—</span> {OPEN_TO}
+                <p className="mt-2 text-title font-semibold tracking-tight text-ps-navy">
+                  del {OPEN_FROM} al {OPEN_TO}
                 </p>
                 <p className="mt-1 text-sm text-ps-muted">de cada mes</p>
               </>
