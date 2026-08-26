@@ -56,7 +56,7 @@ export default function Instructivo() {
           >
             <video
               className="w-full h-full object-contain"
-              src={encodeURI("/Video/Radicación de Facturas.mp4")}
+              src="/Video/radicacion-preventiva.mp4"
               controls
               preload="metadata"
               controlsList="nodownload"
