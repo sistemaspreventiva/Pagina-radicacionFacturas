@@ -9,7 +9,7 @@ const TZ = "America/Bogota";
 //
 // Para volver al rango corto basta con poner MES_COMPLETO en false:
 // entonces rige OPEN_FROM..OPEN_TO.
-export const MES_COMPLETO = false;
+export const MES_COMPLETO = true;
 export const OPEN_FROM = 1;
 export const OPEN_TO = 5;
 
